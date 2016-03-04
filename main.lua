@@ -1,6 +1,4 @@
 
-local player = display.newRect(200, 200, 20, 20); player:setFillColor(1, 0, 0);
-
 local latitudeDisplay = display.newText( '-', 100, 50, native.systemFont, 16 )
 local longitudeDisplay = display.newText( '-', 100, 100, native.systemFont, 16 )
 local altitudeDisplay = display.newText( '-', 100, 150, native.systemFont, 16 )
@@ -10,12 +8,59 @@ local directionDisplay = display.newText( '-', 100, 300, native.systemFont, 16 )
 local timeDisplay = display.newText( '-', 100, 350, native.systemFont, 16 )
 
 ------------------------------------------------------------------
+-- Get recipe for level 
+--  Starting point
+--	Objects: width, height, source, parallax effect
+--	List of portals
+--	List of treasures
+--	List of landmarks
+
+local level_recipe = {};
+
+level_recipe.starting_point = {100, 100};
+level_recipe.objects = {};
+level_recipe.portals = {};
+level_recipe.treasures = {};
+
+-- World group determines drawing order of group
+-- Need a group for background
+-- Need a group for game objects
+-- Need a group for player
+-- Need a group for UI 
+
+local world_group = display.newGroup();
+
+local background_group = display.newGroup();
+local objects_group = display.newGroup();
+local player_group = display.newGroup();
+local UI_group = display.newGroup();
+
+world_group:insert(background_group);
+world_group:insert(objects_group);
+world_group:insert(player_group);
+world_group:insert(UI_group);
+
+-- Construct the world
+
+local background = display.newRect(200, 200, 100, 100); background:setFillColor(0, 1, 1);
+local player = display.newRect(200, 200, 20, 20); player:setFillColor(1, 0, 0);
+
+background_group:insert(background);
+player_group:insert(player);
+
+------------------------------------------------------------------
+
+local SCREEN_WIDTH = display.contentWidth;
+local SCREEN_HEIGHT = display.contentHeight;
+
+------------------------------------------------------------------
 
 local settings = {};
 
-settings.DEBUG_MODE         = true;
+settings.DEBUG_WITH_DATA    = false;
+settings.DEBUG_WITH_EVENT   = true;
 
-settings.TIME_TRESHOLD      = 10;
+settings.TIME_TRESHOLD      = 1;
 settings.DISTANCE_THRESHOLD = 0.00015;
 
 ------------------------------------------------------------------
@@ -123,8 +168,11 @@ local location_handler = function( event )
 
         if (movement.valid) then
 
-            player.x = player.x + 20 * math.cos(movement.direction);
-            player.y = player.y + 20 * math.sin(movement.direction);
+            background_group.x = background_group.x - 20 * math.cos(movement.direction);
+            background_group.y = background_group.y + 20 * math.sin(movement.direction);
+
+			-- Check for portals
+			-- Check for treasures
         end
     end
 end
@@ -132,6 +180,7 @@ end
 ------------------------------------------------------------------
 -- Debug
 
+local DEBUG_INCREMENT = 0.0001;
 local debug_iteration = 1;
 
 local debug_event = {};
@@ -146,27 +195,62 @@ debug_event.speed = 0;
 debug_event.direction = 0;
 
 local debug_handler = function()
-    
-    location_handler(debug_event);
+		
+	location_handler(debug_event);
 
     debug_event.time = debug_iteration;
     debug_iteration = debug_iteration + 1;
+end
+
+------------------------------------------------------------------
+
+local debug_handler_data = function()
+    
+	debug_handler();
 
     if (debug_iteration % 10 == 0) then
 
         if (math.random() < 0.5) then
-            debug_event.longitude = debug_event.longitude + 0.0001;
+            debug_event.longitude = debug_event.longitude + DEBUG_INCREMENT;
         else
-            debug_event.latitude = debug_event.latitude + 0.0001;
+            debug_event.latitude = debug_event.latitude + DEBUG_INCREMENT;
         end
     end
 end
 
 ------------------------------------------------------------------
+
+local debug_with_event_detector = display.newRect(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT);
+debug_with_event_detector.isVisible = false;
+debug_with_event_detector.isHitTestable = true;
+
+local debug_handler_event = function(event)
+	
+	debug_handler();
+
+	if (event.phase == 'ended') then
+			
+		if (event.y < (SCREEN_HEIGHT / 2)) then
+			debug_event.latitude = debug_event.latitude + DEBUG_INCREMENT;
+		else
+			debug_event.latitude = debug_event.latitude - DEBUG_INCREMENT;
+		end						
+		
+		if (event.x > (SCREEN_WIDTH / 2)) then
+			debug_event.longitude = debug_event.longitude + DEBUG_INCREMENT;
+		else
+			debug_event.longitude = debug_event.longitude - DEBUG_INCREMENT;
+		end						
+	end
+end
+
+------------------------------------------------------------------
 -- Run location
 
-if (settings.DEBUG_MODE) then
-    timer.performWithDelay(500, debug_handler, -1);
+if (settings.DEBUG_WITH_DATA) then
+    timer.performWithDelay(50, debug_handler_data, -1);
+elseif (settings.DEBUG_WITH_EVENT) then
+	debug_with_event_detector:addEventListener('touch', debug_handler_event);
 else
     Runtime:addEventListener('location', location_handler);
 end
