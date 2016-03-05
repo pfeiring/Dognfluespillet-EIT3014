@@ -8,7 +8,7 @@ local directionDisplay = display.newText( '-', 100, 300, native.systemFont, 16 )
 local timeDisplay = display.newText( '-', 100, 350, native.systemFont, 16 )
 
 ------------------------------------------------------------------
--- Get recipe for level 
+-- Recipe for level 
 --  Starting point
 --	Objects: width, height, source, parallax effect
 --	List of portals
@@ -18,9 +18,14 @@ local timeDisplay = display.newText( '-', 100, 350, native.systemFont, 16 )
 local level_recipe = {};
 
 level_recipe.starting_point = {100, 100};
+
 level_recipe.objects = {};
+level_recipe.objects[1] = {x = 200, y = 200};
+
 level_recipe.portals = {};
+
 level_recipe.treasures = {};
+level_recipe.treasures[1] = {x = 100, y = 100};
 
 -- World group determines drawing order of group
 -- Need a group for background
@@ -42,11 +47,52 @@ world_group:insert(UI_group);
 
 -- Construct the world
 
-local background = display.newRect(200, 200, 100, 100); background:setFillColor(0, 1, 1);
-local player = display.newRect(200, 200, 20, 20); player:setFillColor(1, 0, 0);
+local objects = {};
 
-background_group:insert(background);
+for i = 1, #level_recipe.objects do
+	
+	local recipe = level_recipe.objects[i];
+	local object = display.newRect(0, 0, 100, 100);
+
+	object.x = recipe.x;
+	object.y = recipe.y;
+	object:setFillColor(0, 0, 1);
+
+	objects[#objects + 1] = object;
+	objects_group:insert(object);
+end
+
+local treasures = {};
+
+for i = 1, #level_recipe.treasures do
+	
+	local recipe = level_recipe.treasures[i];
+	local treasure = display.newRect(0, 0, 30, 30);
+
+	treasure.x = recipe.x;
+	treasure.y = recipe.y;
+	treasure:setFillColor(1, 1, 0);
+
+	treasures[#treasures + 1] = treasure;
+	objects_group:insert(treasure);
+end
+
+local player = display.newRect(200, 200, 20, 20); player:setFillColor(1, 0, 0);
 player_group:insert(player);
+
+------------------------------------------------------------------
+
+local collides_x = function(object_1, object_2)
+	return (math.abs(object_1.x - object_2.x) < (object_1.width + object_2.width) / 2);
+end
+
+local collides_y = function(object_1, object_2)
+	return (math.abs(object_1.y - object_2.y) < (object_1.height + object_2.height) / 2);
+end
+
+local collides = function(object_1, object_2)
+	return (collides_x(object_1, object_2) and collides_y(object_1, object_2));
+end
 
 ------------------------------------------------------------------
 
@@ -168,11 +214,27 @@ local location_handler = function( event )
 
         if (movement.valid) then
 
-            background_group.x = background_group.x - 20 * math.cos(movement.direction);
-            background_group.y = background_group.y + 20 * math.sin(movement.direction);
+			-- Move objects
+			
+			for i = 1, #objects do
+            	objects[i].x = objects[i].x - 20 * math.cos(movement.direction);
+				objects[i].y = objects[i].y + 20 * math.sin(movement.direction);
+			end
+
+			for i = 1, #treasures do
+            	treasures[i].x = treasures[i].x - 20 * math.cos(movement.direction);
+				treasures[i].y = treasures[i].y + 20 * math.sin(movement.direction);
+			end
 
 			-- Check for portals
-			-- Check for treasures
+			
+			-- Check for treasure takings
+		
+			for i = 1, #treasures do
+				if (collides(player, treasures[i])) then
+					treasures[i].isVisible = false;	
+				end
+			end
         end
     end
 end
