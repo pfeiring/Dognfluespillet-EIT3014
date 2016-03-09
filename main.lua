@@ -8,6 +8,23 @@ local directionDisplay = display.newText( '-', 100, 300, native.systemFont, 16 )
 local timeDisplay = display.newText( '-', 100, 350, native.systemFont, 16 )
 
 ------------------------------------------------------------------
+
+local SCREEN_WIDTH = display.contentWidth;
+local SCREEN_HEIGHT = display.contentHeight;
+
+------------------------------------------------------------------
+
+local settings = {};
+
+settings.DEBUG_WITH_DATA    = false;
+settings.DEBUG_WITH_EVENT   = true;
+
+settings.TIME_TRESHOLD      = 1;
+settings.DISTANCE_THRESHOLD = 0.00015;
+
+settings.STEP_SIZE          = 100;
+
+------------------------------------------------------------------
 -- Recipe for level 
 --  Starting point
 --	Objects: width, height, source, parallax effect
@@ -17,15 +34,15 @@ local timeDisplay = display.newText( '-', 100, 350, native.systemFont, 16 )
 
 local level_recipe = {};
 
-level_recipe.starting_point = {100, 100};
+level_recipe.starting_point = {400, 480};
 
 level_recipe.objects = {};
-level_recipe.objects[1] = {x = 200, y = 200};
+level_recipe.objects[1] = {file = 'world.png', width = 3080 * 0.8, height = 1909 * 0.8, x = 1200, y = 220 };
 
 level_recipe.portals = {};
 
 level_recipe.treasures = {};
-level_recipe.treasures[1] = {x = 100, y = 100};
+level_recipe.treasures[1] = {x = 700, y = 500};
 
 -- World group determines drawing order of group
 -- Need a group for background
@@ -52,11 +69,10 @@ local objects = {};
 for i = 1, #level_recipe.objects do
 	
 	local recipe = level_recipe.objects[i];
-	local object = display.newRect(0, 0, 100, 100);
+	local object = display.newImageRect(recipe.file, recipe.width, recipe.height);
 
 	object.x = recipe.x;
 	object.y = recipe.y;
-	object:setFillColor(0, 0, 1);
 
 	objects[#objects + 1] = object;
 	objects_group:insert(object);
@@ -77,7 +93,11 @@ for i = 1, #level_recipe.treasures do
 	objects_group:insert(treasure);
 end
 
-local player = display.newRect(200, 200, 20, 20); player:setFillColor(1, 0, 0);
+local player = display.newRect(0, 0, 50, 50);
+player.x = level_recipe.starting_point[1];
+player.y = level_recipe.starting_point[2];
+player:setFillColor(1, 0, 0);
+
 player_group:insert(player);
 
 ------------------------------------------------------------------
@@ -93,21 +113,6 @@ end
 local collides = function(object_1, object_2)
 	return (collides_x(object_1, object_2) and collides_y(object_1, object_2));
 end
-
-------------------------------------------------------------------
-
-local SCREEN_WIDTH = display.contentWidth;
-local SCREEN_HEIGHT = display.contentHeight;
-
-------------------------------------------------------------------
-
-local settings = {};
-
-settings.DEBUG_WITH_DATA    = false;
-settings.DEBUG_WITH_EVENT   = true;
-
-settings.TIME_TRESHOLD      = 1;
-settings.DISTANCE_THRESHOLD = 0.00015;
 
 ------------------------------------------------------------------
 
@@ -217,13 +222,13 @@ local location_handler = function( event )
 			-- Move objects
 			
 			for i = 1, #objects do
-            	objects[i].x = objects[i].x - 20 * math.cos(movement.direction);
-				objects[i].y = objects[i].y + 20 * math.sin(movement.direction);
+            	objects[i].x = objects[i].x - settings.STEP_SIZE * math.cos(movement.direction);
+				objects[i].y = objects[i].y + settings.STEP_SIZE * math.sin(movement.direction);
 			end
 
 			for i = 1, #treasures do
-            	treasures[i].x = treasures[i].x - 20 * math.cos(movement.direction);
-				treasures[i].y = treasures[i].y + 20 * math.sin(movement.direction);
+            	treasures[i].x = treasures[i].x - settings.STEP_SIZE * math.cos(movement.direction);
+				treasures[i].y = treasures[i].y + settings.STEP_SIZE * math.sin(movement.direction);
 			end
 
 			-- Check for portals
