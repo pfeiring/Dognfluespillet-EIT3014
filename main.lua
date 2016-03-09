@@ -16,6 +16,9 @@ local timeDisplay = display.newText( '-', 100, 350, native.systemFont, 16 )
 local SCREEN_WIDTH = display.contentWidth;
 local SCREEN_HEIGHT = display.contentHeight;
 
+local HALF_SCREEN_WIDTH = SCREEN_WIDTH * 0.5;
+local HALF_SCREEN_HEIGHT = SCREEN_HEIGHT * 0.5;
+
 ------------------------------------------------------------------
 
 local settings = {};
@@ -26,7 +29,7 @@ settings.DEBUG_WITH_EVENT   = true;
 settings.TIME_TRESHOLD      = 1;
 settings.DISTANCE_THRESHOLD = 0.00015;
 
-settings.STEP_SIZE          = 50;
+settings.STEP_SIZE          = 100;
 
 ------------------------------------------------------------------
 -- Recipe for level 
@@ -38,50 +41,107 @@ settings.STEP_SIZE          = 50;
 
 local level_recipe = {};
 
-level_recipe.starting_point = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
+level_recipe.starting_point = {};
+level_recipe.starting_point.x = 0;
+level_recipe.starting_point.y = 400;
+
+------------------------------------------------------------------
+
+level_recipe.frame = {};
+level_recipe.frame.width = 3080 * 0.8;
+level_recipe.frame.height = 1909 * 0.8;
+level_recipe.frame.x = 0;
+level_recipe.frame.y = 0;
+
+level_recipe.frame.left = level_recipe.frame.x - level_recipe.frame.width / 2;
+level_recipe.frame.right = level_recipe.frame.x + level_recipe.frame.width / 2;
+level_recipe.frame.top = level_recipe.frame.y - level_recipe.frame.height / 2;
+level_recipe.frame.bottom = level_recipe.frame.y + level_recipe.frame.height / 2;
+
+------------------------------------------------------------------
 
 level_recipe.objects = {};
-level_recipe.objects[1] = {file = 'world_bw.png', width = 3080 * 0.8, height = 1909 * 0.8, x = 1200, y = 220 };
+level_recipe.objects[1] = {file = 'world_bw.png', width = 3080 * 0.8, height = 1909 * 0.8, x = 0, y = 0 };
 --level_recipe.objects[1] = {file = 'world.jpeg', width = 2453 * 0.8, height = 1532 * 0.8, x = 950, y = 320 };
 
 level_recipe.portals = {};
 
 level_recipe.treasures = {};
-level_recipe.treasures[1] = {x = 700, y = 500};
+level_recipe.treasures[1] = {x = 700,  y = 500};
 level_recipe.treasures[2] = {x = 1000, y = 500};
 
+------------------------------------------------------------------
 -- Master group determines drawing order of groups
--- World group determines drawing order of in game objects, also functions as camera
+-- Camera group determines drawing order of in game objects
 
 local background_group = display.newGroup();
 local objects_group = display.newGroup();
 local player_group = display.newGroup();
-local world_group = display.newGroup();
+local camera = display.newGroup();
 
 local UI_group = display.newGroup();
 
 local master_group = display.newGroup();
 
-world_group:insert(background_group);
-world_group:insert(objects_group);
-world_group:insert(player_group);
+camera:insert(background_group);
+camera:insert(objects_group);
+camera:insert(player_group);
 
-master_group:insert(world_group);
+master_group:insert(camera);
 master_group:insert(UI_group);
+
+------------------------------------------------------------------
+-- Camera
+
+camera.TARGET_POSITION_X = HALF_SCREEN_WIDTH;
+camera.TARGET_POSITION_Y = HALF_SCREEN_HEIGHT + 200;
+
+function camera:update(player)
+
+    local offset_x = camera.TARGET_POSITION_X - player.x;
+    local offset_y = camera.TARGET_POSITION_Y - player.y;
+    
+    -- Avoid that the desired camera position in the x direction shows black background
+
+    if (player.x < level_recipe.frame.left + camera.TARGET_POSITION_X) then
+       
+        offset_x = camera.TARGET_POSITION_X - (level_recipe.frame.left + camera.TARGET_POSITION_X);
+    
+    elseif (player.x > level_recipe.frame.right - (SCREEN_WIDTH - camera.TARGET_POSITION_X)) then
+       
+        offset_x = camera.TARGET_POSITION_X - (level_recipe.frame.right - (SCREEN_WIDTH - camera.TARGET_POSITION_X));
+    end
+
+    -- Avoid that the desired camera position in the y direction shows black background
+
+    if (player.y < level_recipe.frame.top + camera.TARGET_POSITION_Y) then
+    
+        offset_y = camera.TARGET_POSITION_Y - (level_recipe.frame.top + camera.TARGET_POSITION_Y);
+    
+    elseif (player.y > level_recipe.frame.bottom - (SCREEN_HEIGHT - camera.TARGET_POSITION_Y)) then
+        
+        offset_y = camera.TARGET_POSITION_Y - (level_recipe.frame.bottom - (SCREEN_HEIGHT - camera.TARGET_POSITION_Y));
+    end
+
+    camera.x = offset_x;
+    camera.y = offset_y;
+end
 
 ------------------------------------------------------------------
 -- UI
 
-local happy_meter = display.newRect(0, 0, 50, 100);
-happy_meter.x = 20;
-happy_meter.y = 20;
-happy_meter:setFillColor(0, 0, 1);
-happy_meter.anchorX = 0;
-happy_meter.anchorY = 0;
-happy_meter.yScale = 0.5;
+local UI = {};
 
-function happy_meter:update(increase)
-    happy_meter.yScale = math.min(1, happy_meter.yScale + increase);
+UI.happy_meter = display.newRect(0, 0, 50, 100);
+UI.happy_meter.x = 20;
+UI.happy_meter.y = 20;
+UI.happy_meter:setFillColor(0, 0, 1);
+UI.happy_meter.anchorX = 0;
+UI.happy_meter.anchorY = 0;
+UI.happy_meter.yScale = 0.5;
+
+function UI.happy_meter:update(increase)
+    UI.happy_meter.yScale = math.min(1, UI.happy_meter.yScale + increase);
 end
 
 ------------------------------------------------------------------
@@ -117,8 +177,8 @@ for i = 1, #level_recipe.treasures do
 end
 
 local player = display.newRect(0, 0, 50, 50);
-player.x = level_recipe.starting_point[1];
-player.y = level_recipe.starting_point[2];
+player.x = level_recipe.starting_point.x;
+player.y = level_recipe.starting_point.y;
 player:setFillColor(1, 0, 0);
 
 player_group:insert(player);
@@ -249,11 +309,12 @@ local location_handler = function( event )
 
             player.x = player.x + step_x;
             player.y = player.y - step_y;
-			
-            world_group.x = world_group.x - step_x;
-            world_group.y = world_group.y + step_y;
+
+            camera:update(player);
 
 			-- Check for portals
+
+
 			
 			-- Check for treasure takings
 		
@@ -263,7 +324,7 @@ local location_handler = function( event )
                     treasures[i].isVisible = false;
                     treasures[i].taken = true;
 
-                    happy_meter:update(0.1);
+                    UI.happy_meter:update(0.1);
 				end
 			end
         end
@@ -313,7 +374,7 @@ end
 
 ------------------------------------------------------------------
 
-local debug_with_event_detector = display.newRect(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT);
+local debug_with_event_detector = display.newRect(HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT);
 debug_with_event_detector.isVisible = false;
 debug_with_event_detector.isHitTestable = true;
 
@@ -323,19 +384,21 @@ local debug_handler_event = function(event)
 
 	if (event.phase == 'ended') then
 
-        local delta_x = event.x - (SCREEN_WIDTH / 2);
-        local delta_y = event.y - (SCREEN_HEIGHT / 2);
+        local delta_x = event.x - HALF_SCREEN_WIDTH;
+        local delta_y = event.y - HALF_SCREEN_HEIGHT;
 
         local alpha = math.atan2(delta_y, delta_x);
         local magnitude = delta_x * delta_x + delta_y * delta_y;
 
-        debug_event.longitude = debug_event.longitude + 0.01 * magnitude * math.cos(alpha);
-        debug_event.latitude = debug_event.latitude - 0.01 * magnitude * math.sin(alpha);
+        debug_event.longitude = debug_event.longitude + 0.1 * magnitude * math.cos(alpha);
+        debug_event.latitude = debug_event.latitude - 0.1 * magnitude * math.sin(alpha);
 	end
 end
 
 ------------------------------------------------------------------
--- Run location
+-- Run
+
+camera:update(player);
 
 if (settings.DEBUG_WITH_DATA) then
     timer.performWithDelay(50, debug_handler_data, -1);
