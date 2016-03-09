@@ -1,4 +1,8 @@
 
+display.setStatusBar(display.HiddenStatusBar);
+
+------------------------------------------------------------------
+
 local latitudeDisplay = display.newText( '-', 100, 50, native.systemFont, 16 )
 local longitudeDisplay = display.newText( '-', 100, 100, native.systemFont, 16 )
 local altitudeDisplay = display.newText( '-', 100, 150, native.systemFont, 16 )
@@ -22,7 +26,7 @@ settings.DEBUG_WITH_EVENT   = true;
 settings.TIME_TRESHOLD      = 1;
 settings.DISTANCE_THRESHOLD = 0.00015;
 
-settings.STEP_SIZE          = 100;
+settings.STEP_SIZE          = 50;
 
 ------------------------------------------------------------------
 -- Recipe for level 
@@ -37,12 +41,14 @@ local level_recipe = {};
 level_recipe.starting_point = {400, 480};
 
 level_recipe.objects = {};
-level_recipe.objects[1] = {file = 'world.png', width = 3080 * 0.8, height = 1909 * 0.8, x = 1200, y = 220 };
+level_recipe.objects[1] = {file = 'world_bw.png', width = 3080 * 0.8, height = 1909 * 0.8, x = 1200, y = 220 };
+--level_recipe.objects[1] = {file = 'world.jpeg', width = 2453 * 0.8, height = 1532 * 0.8, x = 950, y = 320 };
 
 level_recipe.portals = {};
 
 level_recipe.treasures = {};
 level_recipe.treasures[1] = {x = 700, y = 500};
+level_recipe.treasures[2] = {x = 1000, y = 500};
 
 -- World group determines drawing order of group
 -- Need a group for background
@@ -62,6 +68,18 @@ world_group:insert(objects_group);
 world_group:insert(player_group);
 world_group:insert(UI_group);
 
+------------------------------------------------------------------
+-- UI
+
+local happy_meter = display.newRect(0, 0, 50, 100);
+happy_meter.x = 20;
+happy_meter.y = 20;
+happy_meter:setFillColor(0, 0, 1);
+happy_meter.anchorX = 0;
+happy_meter.anchorY = 0;
+happy_meter.yScale = 0.5;
+
+------------------------------------------------------------------
 -- Construct the world
 
 local objects = {};
@@ -220,6 +238,8 @@ local location_handler = function( event )
         if (movement.valid) then
 
 			-- Move objects
+
+
 			
 			for i = 1, #objects do
             	objects[i].x = objects[i].x - settings.STEP_SIZE * math.cos(movement.direction);
@@ -236,8 +256,12 @@ local location_handler = function( event )
 			-- Check for treasure takings
 		
 			for i = 1, #treasures do
-				if (collides(player, treasures[i])) then
-					treasures[i].isVisible = false;	
+				if (collides(player, treasures[i]) and not treasures[i].taken) then
+					
+                    treasures[i].isVisible = false;
+                    treasures[i].taken = true;
+
+                    happy_meter.yScale = math.min(1, happy_meter.yScale + 0.1);
 				end
 			end
         end
@@ -296,18 +320,15 @@ local debug_handler_event = function(event)
 	debug_handler();
 
 	if (event.phase == 'ended') then
-			
-		if (event.y < (SCREEN_HEIGHT / 2)) then
-			debug_event.latitude = debug_event.latitude + DEBUG_INCREMENT;
-		else
-			debug_event.latitude = debug_event.latitude - DEBUG_INCREMENT;
-		end						
-		
-		if (event.x > (SCREEN_WIDTH / 2)) then
-			debug_event.longitude = debug_event.longitude + DEBUG_INCREMENT;
-		else
-			debug_event.longitude = debug_event.longitude - DEBUG_INCREMENT;
-		end						
+
+        local delta_x = event.x - (SCREEN_WIDTH / 2);
+        local delta_y = event.y - (SCREEN_HEIGHT / 2);
+
+        local alpha = math.atan2(delta_y, delta_x);
+        local magnitude = delta_x * delta_x + delta_y * delta_y;
+
+        debug_event.longitude = debug_event.longitude + 0.01 * magnitude * math.cos(alpha);
+        debug_event.latitude = debug_event.latitude - 0.01 * magnitude * math.sin(alpha);
 	end
 end
 
