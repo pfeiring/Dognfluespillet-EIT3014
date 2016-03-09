@@ -38,7 +38,7 @@ settings.STEP_SIZE          = 50;
 
 local level_recipe = {};
 
-level_recipe.starting_point = {400, 480};
+level_recipe.starting_point = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
 
 level_recipe.objects = {};
 level_recipe.objects[1] = {file = 'world_bw.png', width = 3080 * 0.8, height = 1909 * 0.8, x = 1200, y = 220 };
@@ -50,23 +50,24 @@ level_recipe.treasures = {};
 level_recipe.treasures[1] = {x = 700, y = 500};
 level_recipe.treasures[2] = {x = 1000, y = 500};
 
--- World group determines drawing order of group
--- Need a group for background
--- Need a group for game objects
--- Need a group for player
--- Need a group for UI 
-
-local world_group = display.newGroup();
+-- Master group determines drawing order of groups
+-- World group determines drawing order of in game objects, also functions as camera
 
 local background_group = display.newGroup();
 local objects_group = display.newGroup();
 local player_group = display.newGroup();
+local world_group = display.newGroup();
+
 local UI_group = display.newGroup();
+
+local master_group = display.newGroup();
 
 world_group:insert(background_group);
 world_group:insert(objects_group);
 world_group:insert(player_group);
-world_group:insert(UI_group);
+
+master_group:insert(world_group);
+master_group:insert(UI_group);
 
 ------------------------------------------------------------------
 -- UI
@@ -78,6 +79,10 @@ happy_meter:setFillColor(0, 0, 1);
 happy_meter.anchorX = 0;
 happy_meter.anchorY = 0;
 happy_meter.yScale = 0.5;
+
+function happy_meter:update(increase)
+    happy_meter.yScale = math.min(1, happy_meter.yScale + increase);
+end
 
 ------------------------------------------------------------------
 -- Construct the world
@@ -239,17 +244,14 @@ local location_handler = function( event )
 
 			-- Move objects
 
+            local step_x = settings.STEP_SIZE * math.cos(movement.direction);
+            local step_y = settings.STEP_SIZE * math.sin(movement.direction);
 
+            player.x = player.x + step_x;
+            player.y = player.y - step_y;
 			
-			for i = 1, #objects do
-            	objects[i].x = objects[i].x - settings.STEP_SIZE * math.cos(movement.direction);
-				objects[i].y = objects[i].y + settings.STEP_SIZE * math.sin(movement.direction);
-			end
-
-			for i = 1, #treasures do
-            	treasures[i].x = treasures[i].x - settings.STEP_SIZE * math.cos(movement.direction);
-				treasures[i].y = treasures[i].y + settings.STEP_SIZE * math.sin(movement.direction);
-			end
+            world_group.x = world_group.x - step_x;
+            world_group.y = world_group.y + step_y;
 
 			-- Check for portals
 			
@@ -261,7 +263,7 @@ local location_handler = function( event )
                     treasures[i].isVisible = false;
                     treasures[i].taken = true;
 
-                    happy_meter.yScale = math.min(1, happy_meter.yScale + 0.1);
+                    happy_meter:update(0.1);
 				end
 			end
         end
