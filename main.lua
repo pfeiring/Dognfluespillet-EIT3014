@@ -1,6 +1,8 @@
 
 display.setStatusBar(display.HiddenStatusBar);
 
+display.setDefault('background', 1, 1, 1);
+
 ------------------------------------------------------------------
 
 local latitudeDisplay = display.newText( '-', 100, 50, native.systemFont, 16 )
@@ -34,12 +36,19 @@ settings.STEP_SIZE          = 100;
 ------------------------------------------------------------------
 -- Enum
 
+local IMAGE_FOLDER = 'images';
+
 local NONE = 1;
 local BALOON = 2;
 local TREASURE = 3;
+local WAVE = 4;
+local ACTIVATOR = 5;
 
 local FLOATING_UP = 1;
 local FLOATING_DOWN = 2;
+
+local SIMPLE = 1;
+local BOX = 2;
 
 ------------------------------------------------------------------
 -- Utility functions
@@ -47,6 +56,15 @@ local FLOATING_DOWN = 2;
 local value_or_default = function(value, default)
     
     if (value) then
+        return value;
+    end
+
+    return default;
+end
+
+local conditioned_value_or_default = function(condition, value, default)
+    
+    if (condition) then
         return value;
     end
 
@@ -64,8 +82,8 @@ end
 local level_recipe = {};
 
 level_recipe.starting_point = {};
-level_recipe.starting_point.x = 800;
-level_recipe.starting_point.y = 00;
+level_recipe.starting_point.x = 100;
+level_recipe.starting_point.y = 650;
 
 ------------------------------------------------------------------
 
@@ -88,11 +106,24 @@ level_recipe.objects = {};
 level_recipe.objects[index + 1] = {file = 'world_bw.png', body = NONE, width = 2856 * 0.8, height = 2856 * 0.8, x = 0, y = 0 };
 --level_recipe.objects[1] = {file = 'world.jpeg', width = 2453 * 0.8, height = 1532 * 0.8, x = 950, y = 320 };
 --level_recipe.objects[2] = {file = 'floating.png', body = NONE, movement = FLOATING, width = 696 * 0.8, height = 717 * 0.8, x = -560, y = -470 };
-level_recipe.objects[index + 2] = {file = 'balloon_1.png', event = {type = BALOON, offset = {x = -100, y = -200}}, width = 300 * 0.8, height = 300 * 0.8, x = -760, y = -150 };
-level_recipe.objects[index + 3] = {file = 'balloon_2.png', event = {type = BALOON, offset = {x = -100, y = -200}}, width = 127 * 0.8, height = 138 * 0.8, x = 930, y = -200 };
-level_recipe.objects[index + 4] = {file = 'balloon_3.png', event = {type = BALOON, offset = {x = -100, y = -200}}, width = 151 * 0.8, height = 173 * 0.8, x = 1000, y = -220 };
 
-index = index + 4;
+level_recipe.objects[index + 2] = {file = 'balloon_1.png', event = {type = BALOON, offset = {x = -100, y = -200}}, width = 300 * 0.8, height = 300 * 0.8, x = -760, y = -150 };
+level_recipe.objects[index + 3] = {file = 'balloon_2.png', event = {type = BALOON, offset = {x = -20, y = -200}}, width = 127 * 0.8, height = 138 * 0.8, x = 930, y = -200 };
+level_recipe.objects[index + 4] = {file = 'balloon_3.png', event = {type = BALOON, offset = {x = -20, y = -200}}, width = 151 * 0.8, height = 173 * 0.8, x = 1000, y = -220 };
+level_recipe.objects[index + 5] = {file = 'balloon_3.png', event = {type = BALOON, offset = {x = 100, y = -150}}, width = 151 * 0.8, height = 173 * 0.8, x = 100, y = -650 };
+level_recipe.objects[index + 6] = {file = 'balloon_2.png', event = {type = BALOON, offset = {x = 150, y = -60}}, width = 127 * 0.8, height = 138 * 0.8, x = 150, y = 550 };
+
+index = index + 6;
+
+level_recipe.objects[index + 1] = {file = 'fish.png', id = 1, width = 400 * 0.8, height = 400 * 0.8, x = 100, y = 980 };
+level_recipe.objects[index + 2] = {file = 'wave.png', event = {type = WAVE}, link = 1, width = 400 * 0.8, height = 400 * 0.8, x = 100, y = 980 };
+
+index = index + 2;
+
+level_recipe.objects[index + 1] = {file = 'lighthouse_light.png', id = 50, invisible = true, width = 606 * 0.8, height = 600 * 0.8, x = 990, y = 290 };
+level_recipe.objects[index + 2] = {file = 'lighthouse.png', event = {type = ACTIVATOR}, link = 50, width = 294 * 0.8, height = 283 * 0.8, x = 1000, y = 290 };
+
+index = index + 2;
 
 level_recipe.objects[index + 1] = {rectangle = true, body = TREASURE, width = 30, height = 30, fill_color = {1, 1, 0}, x = 0,  y = 100};
 level_recipe.objects[index + 2] = {rectangle = true, body = TREASURE, width = 30, height = 30, fill_color = {1, 1, 0}, x = -200,  y = 100};
@@ -120,10 +151,21 @@ master_group:insert(UI_group);
 ------------------------------------------------------------------
 -- Camera
 
+camera.mode = SIMPLE;
+
 camera.TARGET_POSITION_X = HALF_SCREEN_WIDTH;
-camera.TARGET_POSITION_Y = HALF_SCREEN_HEIGHT + 200;
+camera.TARGET_POSITION_Y = HALF_SCREEN_HEIGHT;
 
 function camera:update(player)
+
+    if (camera.mode == SIMPLE) then
+        camera:simple_update(player);
+    else
+        camera:box_update(player);
+    end
+end
+
+function camera:box_update(player)
 
     local offset_x = camera.TARGET_POSITION_X - player.x;
     local offset_y = camera.TARGET_POSITION_Y - player.y;
@@ -154,6 +196,15 @@ function camera:update(player)
     camera.y = offset_y;
 end
 
+function camera:simple_update(player)
+
+    local offset_x = camera.TARGET_POSITION_X - player.x;
+    local offset_y = camera.TARGET_POSITION_Y - player.y;
+
+    camera.x = offset_x;
+    camera.y = offset_y;
+end
+
 ------------------------------------------------------------------
 -- UI
 
@@ -169,25 +220,6 @@ UI.happy_meter.yScale = 0.5;
 
 function UI.happy_meter:update(increase)
     UI.happy_meter.yScale = math.min(1, UI.happy_meter.yScale + increase);
-end
-
-------------------------------------------------------------------
--- Movement
-
-local function movement_floating_down(object, random_position_offset, random_time_offset)
-    
-    transition.to(object, {transition = easing.inOutQuad, y = object.y + 20 + random_position_offset, time = 5000 + random_time_offset, onComplete =
-    function()
-        transition.to(object, {transition = easing.inOutQuad, y = object.y - 20 - random_position_offset, time = 5000 + random_time_offset, onComplete = function() movement_floating_down(object, random_position_offset, random_time_offset) end});
-    end});
-end
-
-local function movement_floating_up(object, random_position_offset, random_time_offset)
-    
-    transition.to(object, {transition = easing.inOutQuad, y = object.y - 20 - random_position_offset, time = 5000 + random_time_offset, onComplete =
-    function()
-        transition.to(object, {transition = easing.inOutQuad, y = object.y + 20 + random_position_offset, time = 5000 + random_time_offset, onComplete = function() movement_floating_up(object, random_position_offset, random_time_offset) end});
-    end});
 end
 
 ------------------------------------------------------------------
@@ -224,6 +256,38 @@ local balloon_event = function(event)
     return true;
 end
 
+local wave_event = function(event)
+
+    local wave = event.target;
+    local fish = wave.link;
+
+
+    if (not wave.in_transition) then
+
+        wave.in_transition = true;
+
+        transition.to(fish, {transition = easing.outQuad, time = 1000, y = fish.y - 100});
+        transition.to(fish, {delay = 500, transition = easing.inOutBack, time = 500, rotation = 180});
+        transition.to(fish, {delay = 1100, transition = easing.inQuad, time = 700, y = fish.y});
+        transition.to(fish, {delay = 2000, transition = easing.linear, time = 30, rotation = 0, onComplete =
+                function()
+                    wave.in_transition = false;
+                end});
+    end
+
+    return true;
+end
+
+local activator_event = function(event)
+
+    local activator = event.target;
+    local target = activator.link;
+
+    target.isVisible = not target.isVisible;
+
+    return true;
+end
+
 ------------------------------------------------------------------
 -- Construct the world
 
@@ -234,17 +298,26 @@ for i = 1, #level_recipe.objects do
 	local recipe = level_recipe.objects[i];
 	local object;
 
-    -- Asset type
+    -- Asset
 
     if (recipe.rectangle) then
         object = display.newRect(0, 0, recipe.width, recipe.height);
         object:setFillColor(unpack(recipe.fill_color));
     else
-        object = display.newImageRect(recipe.file, recipe.width, recipe.height);
+        object = display.newImageRect(IMAGE_FOLDER .. '/' .. recipe.file, recipe.width, recipe.height);
     end
+
+    if (recipe.invisible) then
+        object.isVisible = false;
+    end
+
+    -- Object
 
 	object.x = recipe.x;
 	object.y = recipe.y;
+    
+    object.id = recipe.id;
+    object.link = recipe.link;
 
     object.body = recipe.body;
     object.direction = recipe.direction;
@@ -257,7 +330,7 @@ for i = 1, #level_recipe.objects do
     if (recipe.event) then
         
         local event = recipe.event;
-
+        
         if (event.type == BALOON) then
 
             object.offset = {};
@@ -265,21 +338,35 @@ for i = 1, #level_recipe.objects do
             object.offset.y = event.offset.y;
             
             object:addEventListener('tap', balloon_event);
+
+        elseif (event.type == WAVE) then
+
+            object:addEventListener('tap', wave_event);
+
+        elseif (event.type == ACTIVATOR) then
+            
+            object:addEventListener('tap', activator_event);
         end
     end
+end
 
-    -- Movement
+------------------------------------------------------------------
+-- Setup links between objects
 
-    if (recipe.movement) then
+for i = 1, #objects do
 
-        local movement = recipe.movement;
-        local random_position_offset = math.random() * 5;
-        local random_time_offset = math.ceil(math.random() * 1000);
+    local object = objects[i];
+    
+    if (object.link) then
 
-        if (movement == FLOATING_DOWN) then
-            movement_floating_down(object, random_position_offset, random_time_offset);
-        elseif (movement == FLOATING_UP) then
-            movement_floating_up(object, random_position_offset, random_time_offset);
+        for j = 1, #objects do
+
+            local target = objects[j];
+            
+            if (target.id and target.id == object.link) then
+                
+                object.link = target;
+            end
         end
     end
 end
@@ -295,15 +382,17 @@ player_group:insert(player);
 
 ------------------------------------------------------------------
 
-local collides_x = function(object_1, object_2)
+local collision = {};
+
+function collision:box_x(object_1, object_2)
 	return (math.abs(object_1.x - object_2.x) < (object_1.width + object_2.width) / 2);
 end
 
-local collides_y = function(object_1, object_2)
+function collision:box_y(object_1, object_2)
 	return (math.abs(object_1.y - object_2.y) < (object_1.height + object_2.height) / 2);
 end
 
-local collides = function(object_1, object_2)
+function collision:box(object_1, object_2)
 	return (collides_x(object_1, object_2) and collides_y(object_1, object_2));
 end
 
