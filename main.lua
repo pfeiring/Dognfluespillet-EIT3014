@@ -22,34 +22,27 @@ local HALF_SCREEN_WIDTH = SCREEN_WIDTH * 0.5;
 local HALF_SCREEN_HEIGHT = SCREEN_HEIGHT * 0.5;
 
 ------------------------------------------------------------------
+-- Basic settings
 
-local settings = {};
+local IMAGE_FOLDER          = 'images/';
 
-settings.DEBUG_WITH_DATA    = false;
-settings.DEBUG_WITH_EVENT   = true;
+local DEBUG_WITH_DATA       = false;
+local DEBUG_WITH_EVENT      = true;
 
-settings.TIME_TRESHOLD      = 1;
-settings.DISTANCE_THRESHOLD = 0.00015;
+local TIME_TRESHOLD         = 1;
+local DISTANCE_THRESHOLD    = 0.00015;
 
-settings.STEP_SIZE          = 100;
+local STEP_SIZE             = 100;
 
 ------------------------------------------------------------------
 -- Enum
 
-local IMAGE_FOLDER = 'images/';
-
-local NONE = 1;
-local BALOON = 2;
-local TREASURE = 3;
-local WAVE = 4;
-local ACTIVATOR = 5;
-local MESSAGE = 6;
-
-local FLOATING_UP = 1;
-local FLOATING_DOWN = 2;
-
-local SIMPLE = 1;
-local BOX = 2;
+local NONE          = 1;
+local BALOON        = 2;
+local TREASURE      = 3;
+local WAVE          = 4;
+local ACTIVATOR     = 5;
+local MESSAGE       = 6;
 
 ------------------------------------------------------------------
 -- Utility functions
@@ -176,6 +169,9 @@ master_group:insert(UI_group);
 
 ------------------------------------------------------------------
 -- Camera
+
+local SIMPLE = 1;
+local BOX = 2;
 
 camera.mode = SIMPLE;
 
@@ -550,14 +546,14 @@ local location_handler = function(event)
 
         -- Restrict time between movement, if in car etc.
 
-        if (delta_location.time > settings.TIME_TRESHOLD) then
+        if (delta_location.time > TIME_TRESHOLD) then
 
             -- Euclidean distance from longitude and latitude
 
             movement.distance  = math.sqrt(delta_location.latitude * delta_location.latitude + delta_location.longitude * delta_location.longitude);
             movement.direction = math.atan2(delta_location.latitude, delta_location.longitude);
 
-            if (movement.distance >= settings.DISTANCE_THRESHOLD) then
+            if (movement.distance >= DISTANCE_THRESHOLD) then
 
                 movement_text = 'You\'ve moved';
                 movement.valid = true;
@@ -605,8 +601,8 @@ local location_handler = function(event)
 
         if (movement.valid) then
 
-            local step_x = settings.STEP_SIZE * math.cos(movement.direction);
-            local step_y = settings.STEP_SIZE * math.sin(movement.direction);
+            local step_x = STEP_SIZE * math.cos(movement.direction);
+            local step_y = STEP_SIZE * math.sin(movement.direction);
 
             player.x = player.x + step_x;
             player.y = player.y - step_y;
@@ -695,9 +691,9 @@ end
 
 camera:update(player);
 
-if (settings.DEBUG_WITH_DATA) then
+if (DEBUG_WITH_DATA) then
     timer.performWithDelay(50, debug_handler_data, -1);
-elseif (settings.DEBUG_WITH_EVENT) then
+elseif (DEBUG_WITH_EVENT) then
 	debug_with_event_detector:addEventListener('tap', debug_handler_event);
 else
     Runtime:addEventListener('location', location_handler);
