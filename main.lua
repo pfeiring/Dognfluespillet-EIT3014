@@ -36,13 +36,14 @@ settings.STEP_SIZE          = 100;
 ------------------------------------------------------------------
 -- Enum
 
-local IMAGE_FOLDER = 'images';
+local IMAGE_FOLDER = 'images/';
 
 local NONE = 1;
 local BALOON = 2;
 local TREASURE = 3;
 local WAVE = 4;
 local ACTIVATOR = 5;
+local MESSAGE = 6;
 
 local FLOATING_UP = 1;
 local FLOATING_DOWN = 2;
@@ -118,7 +119,10 @@ index = index + 6;
 level_recipe.objects[index + 1] = {file = 'fish.png', id = 1, width = 400 * 0.8, height = 400 * 0.8, x = 100, y = 980 };
 level_recipe.objects[index + 2] = {file = 'wave.png', event = {type = WAVE}, link = 1, width = 400 * 0.8, height = 400 * 0.8, x = 100, y = 980 };
 
-index = index + 2;
+level_recipe.objects[index + 3] = {file = 'fish.png', id = 2, width = 400 * 0.8, height = 400 * 0.8, x = 440, y = 720 };
+level_recipe.objects[index + 4] = {file = 'wave.png', event = {type = WAVE}, link = 2, width = 400 * 0.8, height = 400 * 0.8, x = 440, y = 720 };
+
+index = index + 4;
 
 level_recipe.objects[index + 1] = {file = 'lighthouse_light.png', id = 50, invisible = true, width = 606 * 0.8, height = 600 * 0.8, x = 990, y = 290 };
 level_recipe.objects[index + 2] = {file = 'lighthouse.png', event = {type = ACTIVATOR}, link = 50, width = 294 * 0.8, height = 283 * 0.8, x = 1000, y = 290 };
@@ -127,6 +131,28 @@ index = index + 2;
 
 level_recipe.objects[index + 1] = {rectangle = true, body = TREASURE, width = 30, height = 30, fill_color = {1, 1, 0}, x = 0,  y = 100};
 level_recipe.objects[index + 2] = {rectangle = true, body = TREASURE, width = 30, height = 30, fill_color = {1, 1, 0}, x = -200,  y = 100};
+
+index = index + 1;
+
+level_recipe.objects[index + 1] = {rectangle = true, body = MESSAGE, alpha = 0.4, message_index = 1, width = 400, height = 400, fill_color = {0, 0, 1}, x = 0,  y = 100};
+level_recipe.objects[index + 2] = {rectangle = true, body = MESSAGE, alpha = 0.4, message_index = 2, width = 200, height = 1000, fill_color = {0, 0, 1}, x = 500,  y = 400};
+level_recipe.objects[index + 3] = {rectangle = true, body = MESSAGE, alpha = 0.4, message_index = 3, width = 500, height = 700, fill_color = {0, 0, 1}, x = -500,  y = -400};
+
+------------------------------------------------------------------
+
+local messages = {};
+
+messages[1] =   {
+                    'Hadde jeg levd lenger enn et døgn så skulle jeg ha flydd en av disse ballongene.'
+                };
+messages[2] =   {
+                    'Jeg tror jeg ser et fyrtårn der borte!',
+                    'Skal vi dra dit?'
+                };
+messages[3] =   {
+                    'Wow! Et svevende hus!',
+                    'Nok om meg, opplever du noe spennende?'
+                };
 
 ------------------------------------------------------------------
 -- Master group determines drawing order of groups
@@ -210,6 +236,8 @@ end
 
 local UI = {};
 
+------------------------------------------------------------------
+
 UI.happy_meter = display.newRect(0, 0, 50, 100);
 UI.happy_meter.x = 20;
 UI.happy_meter.y = 20;
@@ -218,9 +246,72 @@ UI.happy_meter.anchorX = 0;
 UI.happy_meter.anchorY = 0;
 UI.happy_meter.yScale = 0.5;
 
-function UI.happy_meter:update(increase)
+function UI.happy_meter:update(self, increase)
     UI.happy_meter.yScale = math.min(1, UI.happy_meter.yScale + increase);
 end
+
+------------------------------------------------------------------
+
+UI.message = {};
+UI.message.index = -1;
+UI.message.entry = -1;
+
+UI.message_background = display.newImageRect(IMAGE_FOLDER .. 'message_background.png', 640, 640);
+UI.message_background.x = HALF_SCREEN_WIDTH;
+UI.message_background.y = HALF_SCREEN_HEIGHT + 350;
+UI.message_background.isVisible = false;
+
+UI.message_text = display.newText({
+        text = '',
+        x = UI.message_background.x,
+        y = UI.message_background.y + 10,
+        width = 540,
+        font = 'PTMono-Regular',
+        fontSize = 32,
+        align = 'center'});
+UI.message_text:setFillColor(0);
+UI.message_text.isVisible = false;
+
+function UI.message:event(event)
+
+    UI.message.entry = UI.message.entry + 1;
+
+    if (#messages[UI.message.index] >= UI.message.entry) then
+
+        local message = messages[UI.message.index];
+        local message_text = message[UI.message.entry];
+
+        UI.message_text.text = message_text;
+    else
+        UI.message.index = -1;
+        UI.message.entry = -1;
+
+        UI.message_background.isVisible = false;
+        UI.message_text.isVisible = false;
+    end
+end
+
+function UI.message:show(message_index)
+
+    UI.message.index = message_index;
+    UI.message.entry = 1;
+
+    local message = messages[UI.message.index];
+    local message_text = message[UI.message.entry];
+
+    UI.message_text.text = message_text;
+
+    UI.message_background.isVisible = true;
+    UI.message_text.isVisible = true;
+end
+
+UI.message_background:addEventListener('tap', UI.message.event);
+
+------------------------------------------------------------------
+
+UI_group:insert(UI.happy_meter);
+UI_group:insert(UI.message_background);
+UI_group:insert(UI.message_text);
 
 ------------------------------------------------------------------
 -- Event
@@ -304,12 +395,14 @@ for i = 1, #level_recipe.objects do
         object = display.newRect(0, 0, recipe.width, recipe.height);
         object:setFillColor(unpack(recipe.fill_color));
     else
-        object = display.newImageRect(IMAGE_FOLDER .. '/' .. recipe.file, recipe.width, recipe.height);
+        object = display.newImageRect(IMAGE_FOLDER .. recipe.file, recipe.width, recipe.height);
     end
 
     if (recipe.invisible) then
         object.isVisible = false;
     end
+
+    object.alpha = conditioned_value_or_default(recipe.alpha, recipe.alpha, 1);
 
     -- Object
 
@@ -324,6 +417,17 @@ for i = 1, #level_recipe.objects do
 
 	objects[#objects + 1] = object;
 	objects_group:insert(object);
+
+    -- Collision
+
+    if (recipe.body) then
+
+        local body = recipe.body;
+
+        if (body == MESSAGE) then
+            object.message_index = recipe.message_index;
+        end
+    end
 
     -- Events
 
@@ -393,7 +497,7 @@ function collision:box_y(object_1, object_2)
 end
 
 function collision:box(object_1, object_2)
-	return (collides_x(object_1, object_2) and collides_y(object_1, object_2));
+	return (collision:box_x(object_1, object_2) and collision:box_y(object_1, object_2));
 end
 
 ------------------------------------------------------------------
@@ -508,6 +612,19 @@ local location_handler = function(event)
             player.y = player.y - step_y;
 
             camera:update(player);
+
+            -- Collision checks
+
+            for i = 1, #objects do
+
+                local object = objects[i];
+
+                if (object.body == MESSAGE and not object.taken and collision:box(player, object)) then
+                    
+                    object.taken = true;
+                    UI.message:show(object.message_index);
+                end
+            end
         end
     end
 end
