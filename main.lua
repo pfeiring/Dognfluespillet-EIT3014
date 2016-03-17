@@ -5,6 +5,11 @@ display.setDefault('background', 1, 1, 1);
 
 ------------------------------------------------------------------
 
+local c = require('c');
+local world_recipes = require('world_recipes');
+
+------------------------------------------------------------------
+
 local latitudeDisplay = display.newText( '-', 100, 50, native.systemFont, 16 )
 local longitudeDisplay = display.newText( '-', 100, 100, native.systemFont, 16 )
 local altitudeDisplay = display.newText( '-', 100, 150, native.systemFont, 16 )
@@ -35,16 +40,6 @@ local DISTANCE_THRESHOLD    = 0.00015;
 local STEP_SIZE             = 100;
 
 ------------------------------------------------------------------
--- Enum
-
-local NONE          = 1;
-local BALOON        = 2;
-local TREASURE      = 3;
-local WAVE          = 4;
-local ACTIVATOR     = 5;
-local MESSAGE       = 6;
-
-------------------------------------------------------------------
 -- Utility functions
 
 local value_or_default = function(value, default)
@@ -66,70 +61,8 @@ local conditioned_value_or_default = function(condition, value, default)
 end
 
 ------------------------------------------------------------------
--- Recipe for level 
---  Starting point
---	Objects: width, height, source, parallax effect
---	List of portals
---	List of treasures
---	List of landmarks
 
-local level_recipe = {};
-
-level_recipe.starting_point = {};
-level_recipe.starting_point.x = 100;
-level_recipe.starting_point.y = 650;
-
-------------------------------------------------------------------
-
-level_recipe.frame = {};
-level_recipe.frame.width = 2856 * 0.8;
-level_recipe.frame.height = 2856 * 0.8;
-level_recipe.frame.x = 0;
-level_recipe.frame.y = 0;
-
-level_recipe.frame.left = level_recipe.frame.x - level_recipe.frame.width / 2;
-level_recipe.frame.right = level_recipe.frame.x + level_recipe.frame.width / 2;
-level_recipe.frame.top = level_recipe.frame.y - level_recipe.frame.height / 2;
-level_recipe.frame.bottom = level_recipe.frame.y + level_recipe.frame.height / 2;
-
-------------------------------------------------------------------
-
-local index = 0;
-
-level_recipe.objects = {};
-level_recipe.objects[index + 1] = {file = 'world_bw.png', body = NONE, width = 2856 * 0.8, height = 2856 * 0.8, x = 0, y = 0 };
---level_recipe.objects[1] = {file = 'world.jpeg', width = 2453 * 0.8, height = 1532 * 0.8, x = 950, y = 320 };
---level_recipe.objects[2] = {file = 'floating.png', body = NONE, movement = FLOATING, width = 696 * 0.8, height = 717 * 0.8, x = -560, y = -470 };
-
-level_recipe.objects[index + 2] = {file = 'balloon_1.png', event = {type = BALOON, offset = {x = -100, y = -200}}, width = 300 * 0.8, height = 300 * 0.8, x = -760, y = -150 };
-level_recipe.objects[index + 3] = {file = 'balloon_2.png', event = {type = BALOON, offset = {x = -20, y = -200}}, width = 127 * 0.8, height = 138 * 0.8, x = 930, y = -200 };
-level_recipe.objects[index + 4] = {file = 'balloon_3.png', event = {type = BALOON, offset = {x = -20, y = -200}}, width = 151 * 0.8, height = 173 * 0.8, x = 1000, y = -220 };
-level_recipe.objects[index + 5] = {file = 'balloon_3.png', event = {type = BALOON, offset = {x = 100, y = -150}}, width = 151 * 0.8, height = 173 * 0.8, x = 100, y = -650 };
-level_recipe.objects[index + 6] = {file = 'balloon_2.png', event = {type = BALOON, offset = {x = 150, y = -60}}, width = 127 * 0.8, height = 138 * 0.8, x = 150, y = 550 };
-
-index = index + 6;
-
-level_recipe.objects[index + 1] = {file = 'fish.png', id = 1, width = 400 * 0.8, height = 400 * 0.8, x = 100, y = 980 };
-level_recipe.objects[index + 2] = {file = 'wave.png', event = {type = WAVE}, link = 1, width = 400 * 0.8, height = 400 * 0.8, x = 100, y = 980 };
-
-level_recipe.objects[index + 3] = {file = 'fish.png', id = 2, width = 400 * 0.8, height = 400 * 0.8, x = 440, y = 720 };
-level_recipe.objects[index + 4] = {file = 'wave.png', event = {type = WAVE}, link = 2, width = 400 * 0.8, height = 400 * 0.8, x = 440, y = 720 };
-
-index = index + 4;
-
-level_recipe.objects[index + 1] = {file = 'lighthouse_light.png', id = 50, invisible = true, width = 606 * 0.8, height = 600 * 0.8, x = 990, y = 290 };
-level_recipe.objects[index + 2] = {file = 'lighthouse.png', event = {type = ACTIVATOR}, link = 50, width = 294 * 0.8, height = 283 * 0.8, x = 1000, y = 290 };
-
-index = index + 2;
-
-level_recipe.objects[index + 1] = {rectangle = true, body = TREASURE, width = 30, height = 30, fill_color = {1, 1, 0}, x = 0,  y = 100};
-level_recipe.objects[index + 2] = {rectangle = true, body = TREASURE, width = 30, height = 30, fill_color = {1, 1, 0}, x = -200,  y = 100};
-
-index = index + 1;
-
-level_recipe.objects[index + 1] = {rectangle = true, body = MESSAGE, alpha = 0.4, message_index = 1, width = 400, height = 400, fill_color = {0, 0, 1}, x = 0,  y = 100};
-level_recipe.objects[index + 2] = {rectangle = true, body = MESSAGE, alpha = 0.4, message_index = 2, width = 200, height = 1000, fill_color = {0, 0, 1}, x = 500,  y = 400};
-level_recipe.objects[index + 3] = {rectangle = true, body = MESSAGE, alpha = 0.4, message_index = 3, width = 500, height = 700, fill_color = {0, 0, 1}, x = -500,  y = -400};
+local world_recipe = world_recipes:get(world_recipes.FLOWERS);
 
 ------------------------------------------------------------------
 
@@ -194,24 +127,24 @@ function camera:box_update(player)
     
     -- Avoid that the desired camera position in the x direction shows black background
 
-    if (player.x < level_recipe.frame.left + camera.TARGET_POSITION_X) then
+    if (player.x < world_recipe.frame.left + camera.TARGET_POSITION_X) then
        
-        offset_x = camera.TARGET_POSITION_X - (level_recipe.frame.left + camera.TARGET_POSITION_X);
+        offset_x = camera.TARGET_POSITION_X - (world_recipe.frame.left + camera.TARGET_POSITION_X);
     
-    elseif (player.x > level_recipe.frame.right - (SCREEN_WIDTH - camera.TARGET_POSITION_X)) then
+    elseif (player.x > world_recipe.frame.right - (SCREEN_WIDTH - camera.TARGET_POSITION_X)) then
        
-        offset_x = camera.TARGET_POSITION_X - (level_recipe.frame.right - (SCREEN_WIDTH - camera.TARGET_POSITION_X));
+        offset_x = camera.TARGET_POSITION_X - (world_recipe.frame.right - (SCREEN_WIDTH - camera.TARGET_POSITION_X));
     end
 
     -- Avoid that the desired camera position in the y direction shows black background
 
-    if (player.y < level_recipe.frame.top + camera.TARGET_POSITION_Y) then
+    if (player.y < world_recipe.frame.top + camera.TARGET_POSITION_Y) then
     
-        offset_y = camera.TARGET_POSITION_Y - (level_recipe.frame.top + camera.TARGET_POSITION_Y);
+        offset_y = camera.TARGET_POSITION_Y - (world_recipe.frame.top + camera.TARGET_POSITION_Y);
     
-    elseif (player.y > level_recipe.frame.bottom - (SCREEN_HEIGHT - camera.TARGET_POSITION_Y)) then
+    elseif (player.y > world_recipe.frame.bottom - (SCREEN_HEIGHT - camera.TARGET_POSITION_Y)) then
         
-        offset_y = camera.TARGET_POSITION_Y - (level_recipe.frame.bottom - (SCREEN_HEIGHT - camera.TARGET_POSITION_Y));
+        offset_y = camera.TARGET_POSITION_Y - (world_recipe.frame.bottom - (SCREEN_HEIGHT - camera.TARGET_POSITION_Y));
     end
 
     camera.x = offset_x;
@@ -285,6 +218,8 @@ function UI.message:event(event)
         UI.message_background.isVisible = false;
         UI.message_text.isVisible = false;
     end
+
+    return true;
 end
 
 function UI.message:show(message_index)
@@ -380,16 +315,15 @@ end
 
 local objects = {};
 
-for i = 1, #level_recipe.objects do
+for i = 1, #world_recipe.objects do
 	
-	local recipe = level_recipe.objects[i];
+	local recipe = world_recipe.objects[i];
 	local object;
 
     -- Asset
 
     if (recipe.rectangle) then
         object = display.newRect(0, 0, recipe.width, recipe.height);
-        object:setFillColor(unpack(recipe.fill_color));
     else
         object = display.newImageRect(IMAGE_FOLDER .. recipe.file, recipe.width, recipe.height);
     end
@@ -398,8 +332,12 @@ for i = 1, #level_recipe.objects do
         object.isVisible = false;
     end
 
-    object.alpha = conditioned_value_or_default(recipe.alpha, recipe.alpha, 1);
+    if (recipe.fill_color) then
+        object:setFillColor(unpack(recipe.fill_color));
+    end
 
+    object.alpha = conditioned_value_or_default(recipe.alpha, recipe.alpha, 1);
+    
     -- Object
 
 	object.x = recipe.x;
@@ -420,7 +358,7 @@ for i = 1, #level_recipe.objects do
 
         local body = recipe.body;
 
-        if (body == MESSAGE) then
+        if (body == c.MESSAGE) then
             object.message_index = recipe.message_index;
         end
     end
@@ -431,7 +369,7 @@ for i = 1, #level_recipe.objects do
         
         local event = recipe.event;
         
-        if (event.type == BALOON) then
+        if (event.type == c.BALLOON) then
 
             object.offset = {};
             object.offset.x = event.offset.x;
@@ -439,12 +377,13 @@ for i = 1, #level_recipe.objects do
             
             object:addEventListener('tap', balloon_event);
 
-        elseif (event.type == WAVE) then
+        elseif (event.type == c.WAVE) then
 
             object:addEventListener('tap', wave_event);
 
-        elseif (event.type == ACTIVATOR) then
+        elseif (event.type == c.ACTIVATOR) then
             
+            object.isHitTestable = true;
             object:addEventListener('tap', activator_event);
         end
     end
@@ -474,8 +413,8 @@ end
 ------------------------------------------------------------------
 
 local player = display.newRect(0, 0, 50, 50);
-player.x = level_recipe.starting_point.x;
-player.y = level_recipe.starting_point.y;
+player.x = world_recipe.starting_point.x;
+player.y = world_recipe.starting_point.y;
 player:setFillColor(1, 0, 0);
 
 player_group:insert(player);
@@ -615,7 +554,7 @@ local location_handler = function(event)
 
                 local object = objects[i];
 
-                if (object.body == MESSAGE and not object.taken and collision:box(player, object)) then
+                if (object.body == c.MESSAGE and not object.taken and collision:box(player, object)) then
                     
                     object.taken = true;
                     UI.message:show(object.message_index);
