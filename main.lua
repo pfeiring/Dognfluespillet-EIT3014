@@ -20,15 +20,16 @@ local HALF_SCREEN_HEIGHT = SCREEN_HEIGHT * 0.5;
 ------------------------------------------------------------------
 -- Basic settings
 
-local IMAGE_FOLDER          = 'images/';
+local IMAGE_FOLDER                  = 'images/';
 
-local DEBUG_WITH_DATA       = false;
-local DEBUG_WITH_EVENT      = true;
+local DEBUG_WITH_DATA               = false;
+local DEBUG_WITH_EVENT              = true;
 
-local TIME_TRESHOLD         = 1;
-local DISTANCE_THRESHOLD    = 0.00015;
+local LOCATION_TIME_TRESHOLD        = 1;
+local LOCATION_DISTANCE_THRESHOLD   = 0.00015;
+local LOCATION_STEP_SIZE            = 100;
 
-local STEP_SIZE             = 100;
+local GAME_DURATION_IN_MINUTES      = 0.2;               -- Minutes
 
 ------------------------------------------------------------------
 
@@ -58,7 +59,7 @@ master_group:insert(UI_group);
 -- Camera
 
 local SIMPLE = 1;
-local BOX = 2;
+local BOX    = 2;
 
 camera.mode = SIMPLE;
 
@@ -122,7 +123,7 @@ local UI = {};
 ------------------------------------------------------------------
 
 UI.happy_meter = display.newRect(0, 0, 50, 100);
-UI.happy_meter.x = 20;
+UI.happy_meter.x = 20 + 50 + 20;
 UI.happy_meter.y = 20;
 UI.happy_meter:setFillColor(0, 0, 1);
 UI.happy_meter.anchorX = 0;
@@ -131,6 +132,30 @@ UI.happy_meter.yScale = 0.5;
 
 function UI.happy_meter:update(self, increase)
     UI.happy_meter.yScale = math.min(1, UI.happy_meter.yScale + increase);
+end
+
+------------------------------------------------------------------
+
+UI.clock = display.newRect(0, 0, 50, 100);
+UI.clock.x = 20;
+UI.clock.y = 20;
+UI.clock:setFillColor(0, 1, 0);
+UI.clock.anchorX = 0;
+UI.clock.anchorY = 0;
+UI.clock.yScale = 1;
+UI.clock.start_time = os.time();
+
+function UI.clock:update(self)
+
+    local current_time = os.time();
+    local elapsed_time = current_time - UI.clock.start_time;
+    
+    if (elapsed_time >= (GAME_DURATION_IN_MINUTES * 60)) then
+        UI.clock.yScale = 1;
+        UI.clock.isVisible = false;
+    else
+        UI.clock.yScale = 1 - (elapsed_time / (GAME_DURATION_IN_MINUTES * 60));
+    end
 end
 
 ------------------------------------------------------------------
@@ -439,14 +464,14 @@ local location_handler = function(event)
 
         -- Restrict time between movement, if in car etc.
 
-        if (delta_location.time > TIME_TRESHOLD) then
+        if (delta_location.time > LOCATION_TIME_TRESHOLD) then
 
             -- Euclidean distance from longitude and latitude
 
             movement.distance  = math.sqrt(delta_location.latitude * delta_location.latitude + delta_location.longitude * delta_location.longitude);
             movement.direction = math.atan2(delta_location.latitude, delta_location.longitude);
 
-            if (movement.distance >= DISTANCE_THRESHOLD) then
+            if (movement.distance >= LOCATION_DISTANCE_THRESHOLD) then
 
                 movement_text = 'You\'ve moved';
                 movement.valid = true;
@@ -463,8 +488,8 @@ local location_handler = function(event)
 
         if (movement.valid) then
 
-            local step_x = STEP_SIZE * math.cos(movement.direction);
-            local step_y = STEP_SIZE * math.sin(movement.direction);
+            local step_x = LOCATION_STEP_SIZE * math.cos(movement.direction);
+            local step_y = LOCATION_STEP_SIZE * math.sin(movement.direction);
 
             player.x = player.x + step_x;
             player.y = player.y - step_y;
@@ -549,9 +574,18 @@ local debug_handler_event = function(event)
 end
 
 ------------------------------------------------------------------
+
+local game_loop = function(event)
+    
+    UI.clock:update();
+end
+
+------------------------------------------------------------------
 -- Run
 
 camera:update(player);
+
+-- Location
 
 if (DEBUG_WITH_DATA) then
     timer.performWithDelay(50, debug_handler_data, -1);
@@ -560,3 +594,7 @@ elseif (DEBUG_WITH_EVENT) then
 else
     Runtime:addEventListener('location', location_handler);
 end
+
+-- Game loop
+
+Runtime:addEventListener('enterFrame', game_loop);
