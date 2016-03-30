@@ -3,20 +3,21 @@ local camera = {};
 
 ------------------------------------------------------------------
 
-local c = require('c');
+local c 		= require('c');
+local settings  = require('settings');
 
 ------------------------------------------------------------------
 
-camera.mode = c.SIMPLE;
+camera.mode 			 = settings.CAMERA_MODE;
 
-camera.TARGET_POSITION_X = c.HALF_SCREEN_WIDTH;
-camera.TARGET_POSITION_Y = c.HALF_SCREEN_HEIGHT;
+camera.TARGET_POSITION_X = settings.CAMERA_TARGET_POSITION_X;
+camera.TARGET_POSITION_Y = settings.CAMERA_TARGET_POSITION_Y;
 
 ------------------------------------------------------------------
 
 function camera:update(camera_group, player, world_recipe_frame)
 
-    if (camera.mode == SIMPLE) then
+    if (camera.mode == c.SIMPLE) then
         camera:simple_update(camera_group, player, world_recipe_frame);
     else
         camera:box_update(camera_group, player, world_recipe_frame);

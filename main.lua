@@ -5,25 +5,12 @@ display.setDefault('background', 1, 1, 1);
 ------------------------------------------------------------------
 
 local c             = require('c');
+local settings      = require('settings');
 local utilities     = require('utilities');
 local world_recipes = require('world_recipes');
 local collision     = require('collision');
 local events        = require('events');
 local camera        = require('camera');
-
-------------------------------------------------------------------
--- Basic settings
-
-local IMAGE_FOLDER                  = 'images/';
-
-local DEBUG_WITH_DATA               = false;
-local DEBUG_WITH_EVENT              = true;
-
-local LOCATION_TIME_TRESHOLD        = 1;
-local LOCATION_DISTANCE_THRESHOLD   = 0.00015;
-local LOCATION_STEP_SIZE            = 100;
-
-local GAME_DURATION_IN_MINUTES      = 0.2;               -- Minutes
 
 ------------------------------------------------------------------
 
@@ -84,11 +71,11 @@ function UI.clock:update(self)
     local current_time = os.time();
     local elapsed_time = current_time - UI.clock.start_time;
     
-    if (elapsed_time >= (GAME_DURATION_IN_MINUTES * 60)) then
+    if (elapsed_time >= (settings.GAME_DURATION_IN_MINUTES * 60)) then
         UI.clock.yScale = 1;
         UI.clock.isVisible = false;
     else
-        UI.clock.yScale = 1 - (elapsed_time / (GAME_DURATION_IN_MINUTES * 60));
+        UI.clock.yScale = 1 - (elapsed_time / (settings.GAME_DURATION_IN_MINUTES * 60));
     end
 end
 
@@ -98,7 +85,7 @@ UI.message = {};
 UI.message.index = -1;
 UI.message.entry = -1;
 
-UI.message_background = display.newImageRect(IMAGE_FOLDER .. 'message_background.png', 640, 640);
+UI.message_background = display.newImageRect(settings.IMAGE_FOLDER .. 'message_background.png', 640, 640);
 UI.message_background.x = c.HALF_SCREEN_WIDTH;
 UI.message_background.y = c.HALF_SCREEN_HEIGHT + 350;
 UI.message_background.isVisible = false;
@@ -172,7 +159,7 @@ for i = 1, #world_recipe.objects do
     if (recipe.rectangle) then
         object = display.newRect(0, 0, recipe.width, recipe.height);
     else
-        object = display.newImageRect(IMAGE_FOLDER .. recipe.file, recipe.width, recipe.height);
+        object = display.newImageRect(settings.IMAGE_FOLDER .. recipe.file, recipe.width, recipe.height);
     end
 
     if (recipe.invisible) then
@@ -316,14 +303,14 @@ local location_handler = function(event)
 
         -- Restrict time between movement, if in car etc.
 
-        if (delta_location.time > LOCATION_TIME_TRESHOLD) then
+        if (delta_location.time > settings.LOCATION_TIME_TRESHOLD) then
 
             -- Euclidean distance from longitude and latitude
 
             movement.distance  = math.sqrt(delta_location.latitude * delta_location.latitude + delta_location.longitude * delta_location.longitude);
             movement.direction = math.atan2(delta_location.latitude, delta_location.longitude);
 
-            if (movement.distance >= LOCATION_DISTANCE_THRESHOLD) then
+            if (movement.distance >= settings.LOCATION_DISTANCE_THRESHOLD) then
 
                 movement_text = 'You\'ve moved';
                 movement.valid = true;
@@ -340,8 +327,8 @@ local location_handler = function(event)
 
         if (movement.valid) then
 
-            local step_x = LOCATION_STEP_SIZE * math.cos(movement.direction);
-            local step_y = LOCATION_STEP_SIZE * math.sin(movement.direction);
+            local step_x = settings.LOCATION_STEP_SIZE * math.cos(movement.direction);
+            local step_y = settings.LOCATION_STEP_SIZE * math.sin(movement.direction);
 
             player.x = player.x + step_x;
             player.y = player.y - step_y;
@@ -439,10 +426,13 @@ camera:update(camera_group, player, world_recipe.frame);
 
 -- Location
 
-if (DEBUG_WITH_DATA) then
-    timer.performWithDelay(50, debug_handler_data, -1);
-elseif (DEBUG_WITH_EVENT) then
-	debug_with_event_detector:addEventListener('tap', debug_handler_event);
+if (settings.DEBUG) then
+
+    if (settings.DEBUG_MODE == c.DEBUG_WITH_EVENT) then
+        debug_with_event_detector:addEventListener('tap', debug_handler_event);
+    else
+        timer.performWithDelay(50, debug_handler_data, -1);
+    end
 else
     Runtime:addEventListener('location', location_handler);
 end
