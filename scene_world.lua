@@ -365,7 +365,7 @@ function scene:create(event)
     UI.happy_meter:setFillColor(0, 0, 1);
     UI.happy_meter.anchorX = 0;
     UI.happy_meter.anchorY = 0;
-    UI.happy_meter.yScale = 0.5;
+    UI.happy_meter.yScale = settings.HAPPY_METER_START_SCALE;
 
     function UI.happy_meter:update(increase)
         UI.happy_meter.yScale = math.min(1, UI.happy_meter.yScale + increase);
@@ -502,6 +502,8 @@ function scene:create(event)
             
             if (event.type == c.BALLOON) then
 
+                object.happy_meter = UI.happy_meter;
+
                 object.offset = {};
                 object.offset.x = event.offset.x;
                 object.offset.y = event.offset.y;
@@ -510,9 +512,13 @@ function scene:create(event)
 
             elseif (event.type == c.WAVE) then
 
+                object.happy_meter = UI.happy_meter;
+
                 object:addEventListener('tap', events.wave_event);
 
             elseif (event.type == c.ACTIVATOR) then
+
+                object.happy_meter = UI.happy_meter;
                 
                 object.isHitTestable = true;
                 object:addEventListener('tap', events.activator_event);

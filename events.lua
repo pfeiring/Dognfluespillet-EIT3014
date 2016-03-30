@@ -3,32 +3,41 @@ local events = {};
 
 ------------------------------------------------------------------
 
+local settings = require('settings');
+
+------------------------------------------------------------------
+
 function events.balloon_event(event)
     
-    local object = event.target;
+    local balloon = event.target;
 
-    if (not object.in_transition) then
+    if (not balloon.taken) then
+        balloon.taken = true;
+        balloon.happy_meter:update(settings.HAPPY_METER_UPDATE_BALLOON);
+    end
 
-        local offset_x = object.offset.x;
-        local offset_y = object.offset.y;
+    if (not balloon.in_transition) then
 
-        if (object.transitioned) then
+        local offset_x = balloon.offset.x;
+        local offset_y = balloon.offset.y;
+
+        if (balloon.transitioned) then
             
             offset_x = -offset_x;
             offset_y = -offset_y;
 
-            object.transitioned = nil;
+            balloon.transitioned = nil;
         else
-            object.transitioned = true;
+            balloon.transitioned = true;
         end
 
-        transition.to(object, { transition = easing.inOutQuad,
+        transition.to(balloon, { transition = easing.inOutQuad,
                                 time = 8000,
-                                x = object.x + offset_x,
-                                y = object.y + offset_y,
-                                onComplete = function() object.in_transition = nil; end});
+                                x = balloon.x + offset_x,
+                                y = balloon.y + offset_y,
+                                onComplete = function() balloon.in_transition = nil; end});
 
-        object.in_transition = true;
+        balloon.in_transition = true;
     end
 
     return true;
@@ -40,6 +49,11 @@ function events.wave_event(event)
 	
     local wave = event.target;
     local fish = wave.link;
+
+    if (not wave.taken) then
+        wave.taken = true;
+        wave.happy_meter:update(settings.HAPPY_METER_UPDATE_WAVE);
+    end
 
     if (not wave.in_transition) then
 
@@ -63,6 +77,11 @@ function events.activator_event(event)
 
     local activator = event.target;
     local target = activator.link;
+
+    if (not activator.taken) then
+        activator.taken = true;
+        activator.happy_meter:update(settings.HAPPY_METER_UPDATE_ACTIVATOR);
+    end
 
     target.isVisible = not target.isVisible;
 

@@ -130,11 +130,6 @@ local world_recipe_balloon = function()
 
 	index = index + 2;
 
-	world_recipe.objects[index + 1] = {rectangle = true, body = c.TREASURE, happy_meter_gain = 0.1, width = 30, height = 30, fill_color = {1, 1, 0}, x = 0,  y = 100};
-	world_recipe.objects[index + 2] = {rectangle = true, body = c.TREASURE, happy_meter_gain = 0.1, width = 30, height = 30, fill_color = {1, 1, 0}, x = -200,  y = 100};
-
-	index = index + 1;
-
 	world_recipe.objects[index + 1] = {rectangle = true, body = c.MESSAGE, invisible = true, alpha = 0.4, message_index = 1, width = 400, height = 400, fill_color = {0, 0, 1}, x = 0,  y = 100};
 	world_recipe.objects[index + 2] = {rectangle = true, body = c.MESSAGE, invisible = true, alpha = 0.4, message_index = 2, width = 200, height = 1000, fill_color = {0, 0, 1}, x = 500,  y = 400};
 	world_recipe.objects[index + 3] = {rectangle = true, body = c.MESSAGE, invisible = true, alpha = 0.4, message_index = 3, width = 500, height = 700, fill_color = {0, 0, 1}, x = -500,  y = -400};
