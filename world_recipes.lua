@@ -107,16 +107,16 @@ local balloon = function()
 	index = index + 6;
 
 	world_recipe.objects[index + 1] = {file = 'fish.png', id = 1, width = 400 * 0.8, height = 400 * 0.8, x = -200 + 100, y = 980 };
-	world_recipe.objects[index + 2] = {file = 'wave.png', event = {type = WAVE}, link = 1, width = 400 * 0.8, height = 400 * 0.8, x = -200 + 100, y = 980 };
+	world_recipe.objects[index + 2] = {file = 'wave.png', event = {type = c.WAVE}, link = 1, width = 400 * 0.8, height = 400 * 0.8, x = -200 + 100, y = 980 };
 
 	world_recipe.objects[index + 3] = {file = 'fish.png', id = 2, width = 400 * 0.8, height = 400 * 0.8, x = -80 + 440, y = 720 };
-	world_recipe.objects[index + 4] = {file = 'wave.png', event = {type = WAVE}, link = 2, width = 400 * 0.8, height = 400 * 0.8, x = -80 + 440, y = 720 };
+	world_recipe.objects[index + 4] = {file = 'wave.png', event = {type = c.WAVE}, link = 2, width = 400 * 0.8, height = 400 * 0.8, x = -80 + 440, y = 720 };
 
 	world_recipe.objects[index + 5] = {file = 'fish.png', id = 3, width = 400 * 0.8, height = 400 * 0.8, x = -200 + 200, y = 830 };
-	world_recipe.objects[index + 6] = {file = 'wave.png', event = {type = WAVE}, link = 3, width = 400 * 0.8, height = 400 * 0.8, x = -200 + 200, y = 830 };
+	world_recipe.objects[index + 6] = {file = 'wave.png', event = {type = c.WAVE}, link = 3, width = 400 * 0.8, height = 400 * 0.8, x = -200 + 200, y = 830 };
 
 	world_recipe.objects[index + 7] = {file = 'fish.png', id = 4, width = 400 * 0.8, height = 400 * 0.8, x = -200 + -100, y = 920 };
-	world_recipe.objects[index + 8] = {file = 'wave.png', event = {type = WAVE}, link = 4, width = 400 * 0.8, height = 400 * 0.8, x = -200 + -100, y = 920 };
+	world_recipe.objects[index + 8] = {file = 'wave.png', event = {type = c.WAVE}, link = 4, width = 400 * 0.8, height = 400 * 0.8, x = -200 + -100, y = 920 };
 
 	index = index + 8;
 
