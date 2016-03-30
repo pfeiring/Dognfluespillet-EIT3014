@@ -41,7 +41,9 @@ local UI_group;
 
 local UI;
 local objects;
+
 local fly;
+local fly_destination;
 
 ------------------------------------------------------------------
 
@@ -117,32 +119,8 @@ local location_handler = function(event)
 
         if (movement.valid) then
 
-            local step_x = settings.LOCATION_STEP_SIZE * math.cos(movement.direction);
-            local step_y = settings.LOCATION_STEP_SIZE * math.sin(movement.direction);
-
-            fly.x = fly.x + step_x;
-            fly.y = fly.y - step_y;
-
-            if (step_x > 0) then
-                fly.xScale = -1;
-            elseif (step_x < 0) then
-                fly.xScale = 1;
-            end
-
-            camera:update(camera_group, fly, world_recipe.frame);
-
-            -- Collision checks
-
-            for i = 1, #objects do
-
-                local object = objects[i];
-                ----print(object.body, object.x, object.y, #objects)
-                if (object.body == c.MESSAGE and not object.taken and collision:box(fly, object)) then
-                    
-                    object.taken = true;
-                    UI.message:show(object.message_index);
-                end
-            end
+            fly_destination.x = fly_destination.x + settings.LOCATION_STEP_SIZE * math.cos(movement.direction);
+            fly_destination.y = fly_destination.y - settings.LOCATION_STEP_SIZE * math.sin(movement.direction);
         end
     end
 end
@@ -212,14 +190,68 @@ end
 
 ------------------------------------------------------------------
 
+local fly_update = function()
+    
+    local delta_x = fly_destination.x - fly.x;
+    local delta_y = fly_destination.y - fly.y;
+    
+    local alpha = math.atan2(-delta_y, delta_x);
+
+    local delta_speed = (delta_x * delta_x) + (delta_y * delta_y);
+
+    local step_x;
+    local step_y;
+
+    if (delta_speed < (settings.FLY_SPEED * settings.FLY_SPEED)) then
+        step_x = math.sqrt(delta_speed) * math.cos(alpha);
+        step_y = math.sqrt(delta_speed) * math.sin(alpha);
+    else
+        step_x = settings.FLY_SPEED * math.cos(alpha);
+        step_y = settings.FLY_SPEED * math.sin(alpha);
+    end
+
+    fly.x = fly.x + step_x;
+    fly.y = fly.y - step_y;
+
+    if (step_x > 0.01 * settings.FLY_SPEED) then
+        fly.xScale = -1;
+    elseif (step_x < -0.01 * settings.FLY_SPEED) then
+        fly.xScale = 1;
+    end
+
+    camera:update(camera_group, fly, world_recipe.frame);
+
+    -- Collision checks
+
+    for i = 1, #objects do
+
+        local object = objects[i];
+        
+        if (object.body == c.MESSAGE and not object.taken and collision:box(fly, object)) then
+            
+            object.taken = true;
+            UI.message:show(object.message_index);
+
+        elseif (object.body == c.TREASURE and not object.taken and collision:box(fly, object)) then
+
+            object.taken = true;
+            object.isVisible = false;
+
+            UI.happy_meter:update(object.happy_meter_gain);
+        end
+    end
+end
+
+------------------------------------------------------------------
+
 local game_loop = {};
 
 function game_loop:enterFrame(event)
 
     if (not changing_scene) then
 
-        --print(world_name)
         UI.clock:update();
+        fly_update();
         
         if (timed_out) then
             
@@ -335,7 +367,7 @@ function scene:create(event)
     UI.happy_meter.anchorY = 0;
     UI.happy_meter.yScale = 0.5;
 
-    function UI.happy_meter:update(self, increase)
+    function UI.happy_meter:update(increase)
         UI.happy_meter.yScale = math.min(1, UI.happy_meter.yScale + increase);
     end
 
@@ -453,7 +485,12 @@ function scene:create(event)
             local body = recipe.body;
 
             if (body == c.MESSAGE) then
+                
                 object.message_index = recipe.message_index;
+
+            elseif (body == c.TREASURE) then
+
+                object.happy_meter_gain = recipe.happy_meter_gain;
             end
         end
 
@@ -514,6 +551,10 @@ function scene:create(event)
     fly.xScale = -1;
 
     fly_group:insert(fly);
+
+    fly_destination = {};
+    fly_destination.x = fly.x;
+    fly_destination.y = fly.y;
 end
 
 ------------------------------------------------------------------

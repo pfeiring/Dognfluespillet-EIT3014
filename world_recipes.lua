@@ -69,7 +69,7 @@ local world_recipe_balloon = function()
 	------------------------------------------------------------------
 
 	world_recipe.starting_point.x = 100;
-	world_recipe.starting_point.y = 650;
+	world_recipe.starting_point.y = 250;
 
 	------------------------------------------------------------------
 	
@@ -130,8 +130,8 @@ local world_recipe_balloon = function()
 
 	index = index + 2;
 
-	world_recipe.objects[index + 1] = {rectangle = true, body = c.TREASURE, width = 30, height = 30, fill_color = {1, 1, 0}, x = 0,  y = 100};
-	world_recipe.objects[index + 2] = {rectangle = true, body = c.TREASURE, width = 30, height = 30, fill_color = {1, 1, 0}, x = -200,  y = 100};
+	world_recipe.objects[index + 1] = {rectangle = true, body = c.TREASURE, happy_meter_gain = 0.1, width = 30, height = 30, fill_color = {1, 1, 0}, x = 0,  y = 100};
+	world_recipe.objects[index + 2] = {rectangle = true, body = c.TREASURE, happy_meter_gain = 0.1, width = 30, height = 30, fill_color = {1, 1, 0}, x = -200,  y = 100};
 
 	index = index + 1;
 
