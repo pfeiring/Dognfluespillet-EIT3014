@@ -1,6 +1,5 @@
 
 display.setStatusBar(display.HiddenStatusBar);
-
 display.setDefault('background', 1, 1, 1);
 
 ------------------------------------------------------------------
@@ -10,14 +9,7 @@ local utilities     = require('utilities');
 local world_recipes = require('world_recipes');
 local collision     = require('collision');
 local events        = require('events');
-
-------------------------------------------------------------------
-
-local SCREEN_WIDTH = display.contentWidth;
-local SCREEN_HEIGHT = display.contentHeight;
-
-local HALF_SCREEN_WIDTH = SCREEN_WIDTH * 0.5;
-local HALF_SCREEN_HEIGHT = SCREEN_HEIGHT * 0.5;
+local camera        = require('camera');
 
 ------------------------------------------------------------------
 -- Basic settings
@@ -44,78 +36,18 @@ local world_recipe = world_recipes:get(world_recipes.BALLOON);
 local background_group = display.newGroup();
 local objects_group = display.newGroup();
 local player_group = display.newGroup();
-local camera = display.newGroup();
+local camera_group = display.newGroup();
 
 local UI_group = display.newGroup();
 
 local master_group = display.newGroup();
 
-camera:insert(background_group);
-camera:insert(objects_group);
-camera:insert(player_group);
+camera_group:insert(background_group);
+camera_group:insert(objects_group);
+camera_group:insert(player_group);
 
-master_group:insert(camera);
+master_group:insert(camera_group);
 master_group:insert(UI_group);
-
-------------------------------------------------------------------
--- Camera
-
-local SIMPLE = 1;
-local BOX    = 2;
-
-camera.mode = SIMPLE;
-
-camera.TARGET_POSITION_X = HALF_SCREEN_WIDTH;
-camera.TARGET_POSITION_Y = HALF_SCREEN_HEIGHT;
-
-function camera:update(player)
-
-    if (camera.mode == SIMPLE) then
-        camera:simple_update(player);
-    else
-        camera:box_update(player);
-    end
-end
-
-function camera:box_update(player)
-
-    local offset_x = camera.TARGET_POSITION_X - player.x;
-    local offset_y = camera.TARGET_POSITION_Y - player.y;
-    
-    -- Avoid that the desired camera position in the x direction shows black background
-
-    if (player.x < world_recipe.frame.left + camera.TARGET_POSITION_X) then
-       
-        offset_x = camera.TARGET_POSITION_X - (world_recipe.frame.left + camera.TARGET_POSITION_X);
-    
-    elseif (player.x > world_recipe.frame.right - (SCREEN_WIDTH - camera.TARGET_POSITION_X)) then
-       
-        offset_x = camera.TARGET_POSITION_X - (world_recipe.frame.right - (SCREEN_WIDTH - camera.TARGET_POSITION_X));
-    end
-
-    -- Avoid that the desired camera position in the y direction shows black background
-
-    if (player.y < world_recipe.frame.top + camera.TARGET_POSITION_Y) then
-    
-        offset_y = camera.TARGET_POSITION_Y - (world_recipe.frame.top + camera.TARGET_POSITION_Y);
-    
-    elseif (player.y > world_recipe.frame.bottom - (SCREEN_HEIGHT - camera.TARGET_POSITION_Y)) then
-        
-        offset_y = camera.TARGET_POSITION_Y - (world_recipe.frame.bottom - (SCREEN_HEIGHT - camera.TARGET_POSITION_Y));
-    end
-
-    camera.x = offset_x;
-    camera.y = offset_y;
-end
-
-function camera:simple_update(player)
-
-    local offset_x = camera.TARGET_POSITION_X - player.x;
-    local offset_y = camera.TARGET_POSITION_Y - player.y;
-
-    camera.x = offset_x;
-    camera.y = offset_y;
-end
 
 ------------------------------------------------------------------
 -- UI
@@ -167,8 +99,8 @@ UI.message.index = -1;
 UI.message.entry = -1;
 
 UI.message_background = display.newImageRect(IMAGE_FOLDER .. 'message_background.png', 640, 640);
-UI.message_background.x = HALF_SCREEN_WIDTH;
-UI.message_background.y = HALF_SCREEN_HEIGHT + 350;
+UI.message_background.x = c.HALF_SCREEN_WIDTH;
+UI.message_background.y = c.HALF_SCREEN_HEIGHT + 350;
 UI.message_background.isVisible = false;
 
 UI.message_text = display.newText({
@@ -414,7 +346,7 @@ local location_handler = function(event)
             player.x = player.x + step_x;
             player.y = player.y - step_y;
 
-            camera:update(player);
+            camera:update(camera_group, player, world_recipe.frame);
 
             -- Collision checks
 
@@ -475,7 +407,7 @@ end
 
 ------------------------------------------------------------------
 
-local debug_with_event_detector = display.newRect(HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT);
+local debug_with_event_detector = display.newRect(c.HALF_SCREEN_WIDTH, c.HALF_SCREEN_HEIGHT, c.SCREEN_WIDTH, c.SCREEN_HEIGHT);
 debug_with_event_detector.isVisible = false;
 debug_with_event_detector.isHitTestable = true;
 
@@ -483,8 +415,8 @@ local debug_handler_event = function(event)
 	
 	debug_handler();
 
-    local delta_x = event.x - HALF_SCREEN_WIDTH;
-    local delta_y = event.y - HALF_SCREEN_HEIGHT;
+    local delta_x = event.x - c.HALF_SCREEN_WIDTH;
+    local delta_y = event.y - c.HALF_SCREEN_HEIGHT;
 
     local alpha = math.atan2(delta_y, delta_x);
     local magnitude = delta_x * delta_x + delta_y * delta_y;
@@ -503,7 +435,7 @@ end
 ------------------------------------------------------------------
 -- Run
 
-camera:update(player);
+camera:update(camera_group, player, world_recipe.frame);
 
 -- Location
 
