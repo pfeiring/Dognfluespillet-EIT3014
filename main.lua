@@ -5,7 +5,8 @@ display.setDefault('background', 1, 1, 1);
 
 ------------------------------------------------------------------
 
-local c = require('c');
+local c             = require('c');
+local utilities     = require('utilities');
 local world_recipes = require('world_recipes');
 
 ------------------------------------------------------------------
@@ -38,27 +39,6 @@ local TIME_TRESHOLD         = 1;
 local DISTANCE_THRESHOLD    = 0.00015;
 
 local STEP_SIZE             = 100;
-
-------------------------------------------------------------------
--- Utility functions
-
-local value_or_default = function(value, default)
-    
-    if (value) then
-        return value;
-    end
-
-    return default;
-end
-
-local conditioned_value_or_default = function(condition, value, default)
-    
-    if (condition) then
-        return value;
-    end
-
-    return default;
-end
 
 ------------------------------------------------------------------
 
@@ -320,7 +300,7 @@ for i = 1, #world_recipe.objects do
         object:setFillColor(unpack(recipe.fill_color));
     end
 
-    object.alpha = conditioned_value_or_default(recipe.alpha, recipe.alpha, 1);
+    object.alpha = utilities:conditioned_value_or_default(recipe.alpha, recipe.alpha, 1);
     
     -- Object
 
