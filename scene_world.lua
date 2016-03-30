@@ -32,7 +32,7 @@ local changing_scene = false;
 
 local background_group;
 local objects_group;
-local player_group;
+local fly_group;
 local camera_group;
 
 local UI_group;
@@ -41,7 +41,7 @@ local UI_group;
 
 local UI;
 local objects;
-local player;
+local fly;
 
 ------------------------------------------------------------------
 
@@ -120,10 +120,16 @@ local location_handler = function(event)
             local step_x = settings.LOCATION_STEP_SIZE * math.cos(movement.direction);
             local step_y = settings.LOCATION_STEP_SIZE * math.sin(movement.direction);
 
-            player.x = player.x + step_x;
-            player.y = player.y - step_y;
+            fly.x = fly.x + step_x;
+            fly.y = fly.y - step_y;
 
-            camera:update(camera_group, player, world_recipe.frame);
+            if (step_x > 0) then
+                fly.xScale = -1;
+            elseif (step_x < 0) then
+                fly.xScale = 1;
+            end
+
+            camera:update(camera_group, fly, world_recipe.frame);
 
             -- Collision checks
 
@@ -131,7 +137,7 @@ local location_handler = function(event)
 
                 local object = objects[i];
                 ----print(object.body, object.x, object.y, #objects)
-                if (object.body == c.MESSAGE and not object.taken and collision:box(player, object)) then
+                if (object.body == c.MESSAGE and not object.taken and collision:box(fly, object)) then
                     
                     object.taken = true;
                     UI.message:show(object.message_index);
@@ -220,7 +226,7 @@ function game_loop:enterFrame(event)
             Runtime:removeEventListener('enterFrame', game_loop);
 
             changing_scene = true;
-            composer.gotoScene('world', {params = {world_name = c.WORLD_FLOWERS}});
+            composer.gotoScene('scene_end');
         end
     end
 end
@@ -279,14 +285,14 @@ function scene:create(event)
 
     background_group = display.newGroup();
     objects_group = display.newGroup();
-    player_group = display.newGroup();
+    fly_group = display.newGroup();
     camera_group = display.newGroup();
 
     UI_group = display.newGroup();
 
     camera_group:insert(background_group);
     camera_group:insert(objects_group);
-    camera_group:insert(player_group);
+    camera_group:insert(fly_group);
 
     scene_group:insert(camera_group);
     scene_group:insert(UI_group);
@@ -500,12 +506,14 @@ function scene:create(event)
 
     ------------------------------------------------------------------
 
-    player = display.newRect(0, 0, 50, 50);
-    player.x = world_recipe.starting_point.x;
-    player.y = world_recipe.starting_point.y;
-    player:setFillColor(1, 0, 0);
+    fly = display.newImageRect(settings.IMAGE_FOLDER .. 'fly.png', 0.4 * 649, 0.4 * 626);
+    
+    fly.x = world_recipe.starting_point.x;
+    fly.y = world_recipe.starting_point.y;
 
-    player_group:insert(player);
+    fly.xScale = -1;
+
+    fly_group:insert(fly);
 end
 
 ------------------------------------------------------------------
@@ -519,7 +527,7 @@ function scene:show(event)
 
     if (phase == "will") then
 
-        camera:update(camera_group, player, world_recipe.frame);
+        camera:update(camera_group, fly, world_recipe.frame);
 
     -- Called when the scene is now on screen
     -- Insert code here to make the scene come alive

@@ -20,8 +20,8 @@ local world_recipe_flowers = function()
 	------------------------------------------------------------------
 	
 	world_recipe.frame = {};
-	world_recipe.frame.width = 2856 * 0.8;
-	world_recipe.frame.height = 2856 * 0.8;
+	world_recipe.frame.width = 2614;
+	world_recipe.frame.height = 1819;
 	world_recipe.frame.x = 0;
 	world_recipe.frame.y = 0;
 
@@ -34,12 +34,22 @@ local world_recipe_flowers = function()
 
 	world_recipe.messages = {};
 
+	world_recipe.messages[1] =  {
+	                    			'Hadde håpet jeg havnet på fjøddet. Men, men...'
+	                			};
+
 	------------------------------------------------------------------
 
 	world_recipe.objects[index + 1] = {file = 'world_flowers.jpg', body = NONE, width = 2614, height = 1819, x = 0, y = 0 };	
 	world_recipe.objects[index + 2] = {file = 'world_flowers_color.png', id = 1, invisible = true, body = NONE, width = 2614, height = 1819, x = 0, y = 0 };	
 
-	world_recipe.objects[index + 3] = {rectangle = true, event = {type = c.ACTIVATOR}, link = 1, invisible = true, alpha = 0.4, message_index = 3, width = 400, height = 200, fill_color = {0, 0, 1}, x = -100,  y = 800};
+	index = index + 2;
+
+	world_recipe.objects[index + 1] = {rectangle = true, event = {type = c.ACTIVATOR}, link = 1, invisible = true, alpha = 0.4, message_index = 3, width = 400, height = 200, fill_color = {0, 0, 1}, x = -100,  y = 800};
+
+	index = index + 1;
+
+	world_recipe.objects[index + 1] = {rectangle = true, body = c.MESSAGE, invisible = true, alpha = 0.4, message_index = 1, width = 400, height = 400, fill_color = {0, 0, 1}, x = 0,  y = 0};
 
 	return world_recipe;
 end
