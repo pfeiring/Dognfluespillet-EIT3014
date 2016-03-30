@@ -11,16 +11,6 @@ local world_recipes = require('world_recipes');
 
 ------------------------------------------------------------------
 
-local latitudeDisplay = display.newText( '-', 100, 50, native.systemFont, 16 )
-local longitudeDisplay = display.newText( '-', 100, 100, native.systemFont, 16 )
-local altitudeDisplay = display.newText( '-', 100, 150, native.systemFont, 16 )
-local accuracyDisplay = display.newText( '-', 100, 200, native.systemFont, 16 )
-local speedDisplay = display.newText( '-', 100, 250, native.systemFont, 16 )
-local directionDisplay = display.newText( '-', 100, 300, native.systemFont, 16 )
-local timeDisplay = display.newText( '-', 100, 350, native.systemFont, 16 )
-
-------------------------------------------------------------------
-
 local SCREEN_WIDTH = display.contentWidth;
 local SCREEN_HEIGHT = display.contentHeight;
 
@@ -467,37 +457,6 @@ local location_handler = function(event)
                 previous_location.time = current_location.time;
             end
         end
-
-        ------------------------------------------------------------------
-
-        local latitudeText = string.format( '%.4f', event.latitude )
-        latitudeDisplay.text = latitudeText
-
-        local longitudeText = string.format( '%.4f', event.longitude )
-        longitudeDisplay.text = longitudeText
-
-        local altitudeText = string.format( '%.3f', event.altitude )
-        altitudeDisplay.text = altitudeText
-
-        local accuracyText = string.format( '%.3f', event.accuracy )
-        accuracyDisplay.text = accuracyText
-
-        local speedText = string.format( '%.3f', event.speed )
-        speedDisplay.text = speedText
-        speedDisplay.text = movement_text;
-
-        local directionText = string.format( '%.3f', event.direction )
-        directionDisplay.text = directionText
-
-        if (movement.valid) then
-            directionDisplay.text = movement.distance * 100000;
-        else
-            directionDisplay.text = 'no dist';
-        end
-
-        -- Note that 'event.time' is a Unix-style timestamp, expressed in seconds since Jan. 1, 1970
-        local timeText = string.format( '%.0f', event.time )
-        timeDisplay.text = delta_location.time;
 
         ------------------------------------------------------------------
         -- Move world
