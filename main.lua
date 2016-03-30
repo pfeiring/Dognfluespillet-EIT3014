@@ -62,23 +62,7 @@ end
 
 ------------------------------------------------------------------
 
-local world_recipe = world_recipes:get(world_recipes.FLOWERS);
-
-------------------------------------------------------------------
-
-local messages = {};
-
-messages[1] =   {
-                    'Hadde jeg levd lenger enn et døgn så skulle jeg ha flydd en av disse ballongene.'
-                };
-messages[2] =   {
-                    'Jeg tror jeg ser et fyrtårn der borte!',
-                    'Skal vi dra dit?'
-                };
-messages[3] =   {
-                    'Wow! Et svevende hus!',
-                    'Nok om meg, opplever du noe spennende?'
-                };
+local world_recipe = world_recipes:get(world_recipes.BALLOON);
 
 ------------------------------------------------------------------
 -- Master group determines drawing order of groups
@@ -205,9 +189,9 @@ function UI.message:event(event)
 
     UI.message.entry = UI.message.entry + 1;
 
-    if (#messages[UI.message.index] >= UI.message.entry) then
+    if (#world_recipe.messages[UI.message.index] >= UI.message.entry) then
 
-        local message = messages[UI.message.index];
+        local message = world_recipe.messages[UI.message.index];
         local message_text = message[UI.message.entry];
 
         UI.message_text.text = message_text;
@@ -227,7 +211,7 @@ function UI.message:show(message_index)
     UI.message.index = message_index;
     UI.message.entry = 1;
 
-    local message = messages[UI.message.index];
+    local message = world_recipe.messages[UI.message.index];
     local message_text = message[UI.message.entry];
 
     UI.message_text.text = message_text;

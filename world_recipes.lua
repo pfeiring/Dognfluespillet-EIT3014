@@ -37,6 +37,10 @@ local flowers = function()
 
 	------------------------------------------------------------------
 
+	world_recipe.messages = {};
+
+	------------------------------------------------------------------
+
 	world_recipe.objects[index + 1] = {file = 'world_flowers.jpg', body = NONE, width = 2614, height = 1819, x = 0, y = 0 };	
 	world_recipe.objects[index + 2] = {file = 'world_flowers_color.png', id = 1, invisible = true, body = NONE, width = 2614, height = 1819, x = 0, y = 0 };	
 
@@ -73,6 +77,22 @@ local balloon = function()
 	world_recipe.frame.right = world_recipe.frame.x + world_recipe.frame.width / 2;
 	world_recipe.frame.top = world_recipe.frame.y - world_recipe.frame.height / 2;
 	world_recipe.frame.bottom = world_recipe.frame.y + world_recipe.frame.height / 2;
+
+	------------------------------------------------------------------
+
+	world_recipe.messages = {};
+
+	world_recipe.messages[1] =  {
+	                    			'Hadde jeg levd lenger enn et døgn så skulle jeg ha flydd en av disse ballongene.'
+	                			};
+	world_recipe.messages[2] =   {
+	                   			 	'Jeg tror jeg ser et fyrtårn der borte!',
+	                    			'Skal vi dra dit?'
+	                			};
+	world_recipe.messages[3] =  {
+	                    			'Wow! Et svevende hus!',
+	                    			'Nok om meg, opplever du noe spennende?'
+	                			};
 
 	------------------------------------------------------------------
 	
