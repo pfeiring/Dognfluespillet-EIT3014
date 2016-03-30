@@ -7,12 +7,7 @@ local c = require('c');
 
 ------------------------------------------------------------------
 
-world_recipes.BALLOON = 1;
-world_recipes.FLOWERS = 2;
-
-------------------------------------------------------------------
-
-local flowers = function()
+local world_recipe_flowers = function()
 
 	local index = 0;
 
@@ -51,7 +46,7 @@ end
 
 ------------------------------------------------------------------
 
-local balloon = function()
+local world_recipe_balloon = function()
 
 	local index = 0;
 
@@ -139,12 +134,12 @@ end
 
 ------------------------------------------------------------------
 
-function world_recipes:get(world)
+function world_recipes:get(world_name)
 
-	if (world == world_recipes.BALLOON) then
-		return balloon();
+	if (world_name == c.WORLD_BALLOON) then
+		return world_recipe_balloon();
 	else
-		return flowers();
+		return world_recipe_flowers();
 	end
 end
 

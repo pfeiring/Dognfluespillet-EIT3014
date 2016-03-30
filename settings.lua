@@ -23,7 +23,7 @@ settings.LOCATION_TIME_TRESHOLD      	= 1;
 settings.LOCATION_DISTANCE_THRESHOLD   	= 0.00015;
 settings.LOCATION_STEP_SIZE            	= 100;
 
-settings.GAME_DURATION_IN_MINUTES      	= 0.2;               -- Minutes
+settings.GAME_DURATION_IN_MINUTES      	= 0.1;               -- Minutes
 
 ------------------------------------------------------------------
 -- Camera
