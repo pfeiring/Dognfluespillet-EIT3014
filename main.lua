@@ -8,6 +8,7 @@ display.setDefault('background', 1, 1, 1);
 local c             = require('c');
 local utilities     = require('utilities');
 local world_recipes = require('world_recipes');
+local collision     = require('collision');
 
 ------------------------------------------------------------------
 
@@ -397,22 +398,6 @@ player.y = world_recipe.starting_point.y;
 player:setFillColor(1, 0, 0);
 
 player_group:insert(player);
-
-------------------------------------------------------------------
-
-local collision = {};
-
-function collision:box_x(object_1, object_2)
-	return (math.abs(object_1.x - object_2.x) < (object_1.width + object_2.width) / 2);
-end
-
-function collision:box_y(object_1, object_2)
-	return (math.abs(object_1.y - object_2.y) < (object_1.height + object_2.height) / 2);
-end
-
-function collision:box(object_1, object_2)
-	return (collision:box_x(object_1, object_2) and collision:box_y(object_1, object_2));
-end
 
 ------------------------------------------------------------------
 
