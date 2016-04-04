@@ -20,8 +20,8 @@ local world_recipe_flowers = function()
 	------------------------------------------------------------------
 	
 	world_recipe.frame = {};
-	world_recipe.frame.width = 2614;
-	world_recipe.frame.height = 1819;
+	world_recipe.frame.width = 2614 * 1.5;
+	world_recipe.frame.height = 1819 * 1.5;
 	world_recipe.frame.x = 0;
 	world_recipe.frame.y = 0;
 
@@ -40,7 +40,11 @@ local world_recipe_flowers = function()
 
 	------------------------------------------------------------------
 
-	world_recipe.objects[index + 1] = {file = 'world_flowers.jpg', body = NONE, width = 2614, height = 1819, x = 0, y = 0 };	
+	world_recipe.objects[index + 1] = {file = 'crystals_c.jpeg', perspective_factor = 0.6, width = 3508 * 0.6, height = 2480 * 0.6, x = 0, y = 0}
+
+	index = index + 1;
+
+	world_recipe.objects[index + 1] = {file = 'world_flowers_c.png', body = NONE, width = 2527 * 1.5, height = 1819 * 1.5, x = 0, y = 0 };	
 	world_recipe.objects[index + 2] = {file = 'world_flowers_color.png', id = 1, invisible = true, body = NONE, width = 2614, height = 1819, x = 0, y = 0 };	
 
 	index = index + 2;

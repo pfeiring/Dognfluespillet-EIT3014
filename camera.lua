@@ -15,18 +15,22 @@ camera.TARGET_POSITION_Y = settings.CAMERA_TARGET_POSITION_Y;
 
 ------------------------------------------------------------------
 
-function camera:update(camera_group, player, world_recipe_frame)
+function camera:update(camera_group, player, world_recipe_frame, world_recepe_objects)
+
+    local offset = {};
 
     if (camera.mode == c.SIMPLE) then
-        camera:simple_update(camera_group, player, world_recipe_frame);
+        offset = camera:simple_update(camera_group, player, world_recipe_frame, world_recepe_objects);
     else
-        camera:box_update(camera_group, player, world_recipe_frame);
+        offset = camera:box_update(camera_group, player, world_recipe_frame, world_recepe_objects);
     end
+
+    return offset;
 end
 
 ------------------------------------------------------------------
 
-function camera:box_update(camera_group, player, world_recipe_frame)
+function camera:box_update(camera_group, player, world_recipe_frame, world_recepe_objects)
 
     local offset_x = camera.TARGET_POSITION_X - player.x;
     local offset_y = camera.TARGET_POSITION_Y - player.y;
@@ -55,17 +59,23 @@ function camera:box_update(camera_group, player, world_recipe_frame)
 
     camera_group.x = offset_x;
     camera_group.y = offset_y;
+
+    local offset = {x = offset_x, y = offset_y};
+    return offset;
+    
 end
 
 ------------------------------------------------------------------
 
-function camera:simple_update(camera_group, player, world_recipe_frame)
+function camera:simple_update(camera_group, player, world_recipe_frame, world_recepe_objects)
 
     local offset_x = camera.TARGET_POSITION_X - player.x;
     local offset_y = camera.TARGET_POSITION_Y - player.y;
 
     camera_group.x = offset_x;
     camera_group.y = offset_y;
+
+    --return {'x' = offset_x, 'y' = offset_y};
 end
 
 return camera;

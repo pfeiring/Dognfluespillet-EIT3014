@@ -12,7 +12,7 @@ display.setDefault('background', 1, 1, 1);
 
 local goto_options = {
 	params 	= {
-		world_name = c.WORLD_BALLOON
+		world_name = c.WORLD_FLOWERS
 	}
 }
 

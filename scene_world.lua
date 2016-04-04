@@ -219,7 +219,19 @@ local fly_update = function()
         fly.xScale = 1;
     end
 
-    camera:update(camera_group, fly, world_recipe.frame);
+    local offset = camera:update(camera_group, fly, world_recipe.frame, world_recipe.objects);
+    
+    -- Adjust position of objects that simulate perspective offset
+
+    for i = 1, #objects do
+
+        local object = objects[i];
+        
+        if (object.perspective_factor) then
+            
+            transition.to( object, {time=0, x = - (offset.x * object.perspective_factor), y = - (offset.y * object.perspective_factor)})
+        end
+    end
 
     -- Collision checks
 
@@ -474,6 +486,7 @@ function scene:create(event)
 
         object.body = recipe.body;
         object.direction = recipe.direction;
+        object.perspective_factor = recipe.perspective_factor;
 
         objects[#objects + 1] = object;
         objects_group:insert(object);
