@@ -13,20 +13,20 @@ settings.IMAGE_FOLDER       = 'images/';
 ------------------------------------------------------------------
 -- Debug
 
-settings.DEBUG 				= true;
+settings.DEBUG 				= false;
 settings.DEBUG_MODE 		= c.DEBUG_WITH_EVENT;
 
 ------------------------------------------------------------------
 -- Basics
 
-settings.GAME_DURATION_IN_MINUTES      	= 5;            -- Minutes
+settings.GAME_DURATION_IN_MINUTES      	= 15;           -- Minutes
 
 settings.FLY_SPEED 						= 5;
 
 ------------------------------------------------------------------
 -- Location
 
-settings.LOCATION_TIME_TRESHOLD      	= 1;
+settings.LOCATION_TIME_TRESHOLD      	= 5;
 settings.LOCATION_DISTANCE_THRESHOLD   	= 0.00005;
 settings.LOCATION_STEP_SIZE            	= 100;
 
