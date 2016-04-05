@@ -214,9 +214,9 @@ local fly_update = function()
     fly.y = fly.y - step_y;
 
     if (step_x > 0.01 * settings.FLY_SPEED) then
-        fly.xScale = -1;
+        fly.xScale = -0.4;
     elseif (step_x < -0.01 * settings.FLY_SPEED) then
-        fly.xScale = 1;
+        fly.xScale = 0.4;
     end
 
     local offset = camera:update(camera_group, fly, world_recipe.frame, world_recipe.objects);
@@ -562,18 +562,46 @@ function scene:create(event)
 
     ------------------------------------------------------------------
 
-    fly = display.newImageRect(settings.IMAGE_FOLDER .. 'fly.png', 0.4 * 649, 0.4 * 626);
+    local sheetOptions = 
+    {
+        width = 657,
+        height = 626,
+        numFrames = 9,
+        sheetContentWidth = 5921,
+        sheetContentHeight = 626
+    }
+    
+    local sheet_flyingFly = graphics.newImageSheet(settings.IMAGE_FOLDER .. 'sprite_fly.png', sheetOptions )
+    
+    local sequences_flyingFly = {
+        -- consecutive frames sequence
+        {
+            name = 'normalFlying',
+            start = 1,
+            count = 9,
+            time = 1000,
+            loopCount = 0,
+            loopDirection = 'forward'
+        }
+    }    
+
+    fly = display.newSprite( sheet_flyingFly, sequences_flyingFly )
+
+    --fly = display.newImageRect(settings.IMAGE_FOLDER .. 'fly.png', 0.4 * 649, 0.4 * 626);
     
     fly.x = world_recipe.starting_point.x;
     fly.y = world_recipe.starting_point.y;
 
-    fly.xScale = -1;
+    fly.xScale = -0.4;
+    fly.yScale = 0.4;
 
     fly_group:insert(fly);
 
     fly_destination = {};
     fly_destination.x = fly.x;
     fly_destination.y = fly.y;
+
+    fly:play()
 end
 
 ------------------------------------------------------------------
