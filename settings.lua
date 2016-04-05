@@ -21,7 +21,7 @@ settings.DEBUG_MODE 		= c.DEBUG_WITH_EVENT;
 
 settings.GAME_DURATION_IN_MINUTES      	= 15;           -- Minutes
 
-settings.FLY_SPEED 						= 5;
+settings.FLY_SPEED 						= 2;
 
 ------------------------------------------------------------------
 -- Location

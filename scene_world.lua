@@ -333,6 +333,7 @@ function scene:create(event)
 
     UI = {};
 
+    --UI.clock = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_meter.png', 50, 100);
     UI.clock = display.newRect(0, 0, 50, 100);
     UI.clock.x = 20;
     UI.clock.y = 20;
@@ -359,6 +360,7 @@ function scene:create(event)
 
     ------------------------------------------------------------------
 
+    --UI.happy_meter = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_meter.png', 50, 100);
     UI.happy_meter = display.newRect(0, 0, 50, 100);
     UI.happy_meter.x = 20 + 50 + 20;
     UI.happy_meter.y = 20;
