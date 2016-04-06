@@ -107,7 +107,7 @@ local world_recipe_balloon = function()
 	world_recipe.objects[index + 3] = {file = 'balloon_2.png', event = {type = c.BALLOON, offset = {x = -20, y = -200}}, width = 127 * 0.8, height = 138 * 0.8, x = 930, y = -200 };
 	world_recipe.objects[index + 4] = {file = 'balloon_3.png', event = {type = c.BALLOON, offset = {x = -20, y = -200}}, width = 151 * 0.8, height = 173 * 0.8, x = 1000, y = -220 };
 	world_recipe.objects[index + 5] = {file = 'balloon_3.png', event = {type = c.BALLOON, offset = {x = 100, y = -150}}, width = 151 * 0.8, height = 173 * 0.8, x = 100, y = -650 };
-	world_recipe.objects[index + 6] = {file = 'balloon_2.png', event = {type = c.BALLOON, offset = {x = 150, y = -60}}, width = 127 * 0.8, height = 138 * 0.8, x = 150, y = 550 };
+	world_recipe.objects[index + 6] = {file = 'balloon_2.png', event = {type = c.BALLOON, offset = {x = -150, y = 60}}, width = 127 * 0.8, height = 138 * 0.8, x = 150 + 150, y = 550 - 60 };
 
 	index = index + 6;
 
