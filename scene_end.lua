@@ -21,8 +21,13 @@ function scene:create(event)
 
     local scene_group = self.view;
 
-    -- Initialize the scene here
-    -- Example: add display objects to "scene_group", add touch listeners, etc.
+    ------------------------------------------------------------------
+
+    local happy_meter = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_happy_meter_2.png', 76, 76);
+    happy_meter.x = c.HALF_SCREEN_WIDTH;
+    happy_meter.y = 600;
+
+    ------------------------------------------------------------------
 
     local text_options = 
     {
@@ -38,6 +43,9 @@ function scene:create(event)
     local text = display.newText(text_options);
     text:setFillColor(0);
 
+    ------------------------------------------------------------------
+
+    scene_group:insert(happy_meter);   
     scene_group:insert(text);
 end
 

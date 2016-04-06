@@ -19,9 +19,9 @@ settings.DEBUG_MODE 		= c.DEBUG_WITH_EVENT;
 ------------------------------------------------------------------
 -- Basics
 
-settings.GAME_DURATION_IN_MINUTES      	= 5;            -- Minutes
+settings.GAME_DURATION_IN_MINUTES      	= 1;           -- Minutes
 
-settings.FLY_SPEED 						= 5;
+settings.FLY_SPEED 						= 2;
 
 ------------------------------------------------------------------
 -- Location
@@ -33,7 +33,7 @@ settings.LOCATION_STEP_SIZE            	= 100;
 ------------------------------------------------------------------
 -- Happy meter
 
-settings.HAPPY_METER_START_SCALE 		= 0.2;
+settings.HAPPY_METER_START_SCALE 		= 0.5;
 
 settings.HAPPY_METER_UPDATE_BALLOON 	= 0.1;
 settings.HAPPY_METER_UPDATE_WAVE 		= 0.05;
