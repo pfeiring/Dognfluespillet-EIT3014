@@ -387,36 +387,19 @@ function scene:create(event)
     ------------------------------------------------------------------
 
     UI.happy_meter = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_happy_meter_2.png', 76, 76);
-    --UI.happy_meter = display.newRect(0, 0, 50, 100);
-    --UI.happy_meter.x = 20 + 50 + 20;
-    --UI.happy_meter.y = 20;
-    --UI.happy_meter:setFillColor(0, 0, 1);
-    --UI.happy_meter.anchorX = 0;
-    --UI.happy_meter.anchorY = 0;
-    UI.happy_meter.x = 0;--UI.background.x;
-    UI.happy_meter.y = -76 / 2; --UI.background.y;
+    UI.happy_meter.x = UI.background.x;
+    UI.happy_meter.y = UI.background.y;
     UI.happy_meter.value = settings.HAPPY_METER_START_SCALE;
 
-    UI.happy_meter_container = display.newContainer(76, 76);
-    UI.happy_meter_container.anchorChildren = false;
-    UI.happy_meter_container.x = UI.background.x;
-    UI.happy_meter_container.y = UI.background.y + 76 / 2;
-    UI.happy_meter_container.anchorY = 1;
-    
-    UI.happy_meter_container.height = 76 * UI.happy_meter.value;
+    UI.happy_meter_mask = graphics.newMask(settings.IMAGE_FOLDER .. 'UI_happy_meter_mask.png');
+    UI.happy_meter:setMask(UI.happy_meter_mask);
 
-    UI.happy_meter_container:insert(UI.happy_meter);
-
-    --local a = display.newRect(UI.happy_meter_container.x, UI.happy_meter_container.y, UI.happy_meter_container.width, UI.happy_meter_container.height);
-    --a:setFillColor(1, 0, 0, 0.5);
-    --a.anchorY = UI.happy_meter_container.anchorY;
-    --a.yScale = UI.happy_meter_container.yScale;
+    UI.happy_meter.maskY = 76 * (1 - UI.happy_meter.value);
 
     function UI.happy_meter:update(increase)
 
         UI.happy_meter.value = math.min(1, UI.happy_meter.value + increase);
-        --UI.happy_meter_container.yScale = math.min(1, UI.happy_meter.yScale + increase);
-        UI.happy_meter_container.height = 76 * UI.happy_meter.value;
+        UI.happy_meter.maskY = 76 * (1 - UI.happy_meter.value);
     end
 
     ------------------------------------------------------------------
@@ -483,8 +466,7 @@ function scene:create(event)
     UI_group:insert(UI.background);
     UI_group:insert(UI.clock);
     UI_group:insert(UI.happy_meter_background);
-    UI_group:insert(UI.happy_meter_container);
-    --UI_group:insert(UI.happy_meter);
+    UI_group:insert(UI.happy_meter);
     UI_group:insert(UI.message_background);
     UI_group:insert(UI.message_text);
 
