@@ -223,6 +223,7 @@ function game_loop:enterFrame(event)
         
         ------------------------------------------------------------------
 
+        objects:update();
         fly:update();
         
         local camera_offset = camera:update(camera_group, fly:get_position(), world_recipe.frame);

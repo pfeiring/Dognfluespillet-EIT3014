@@ -54,7 +54,7 @@ function UI:update_clock()
 
     local current_time = os.time();
     local elapsed_time = current_time - UI.clock_start_time;
-    
+
     local timed_out;
 
     if (elapsed_time >= (settings.GAME_DURATION_IN_MINUTES * 60)) then

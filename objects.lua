@@ -73,6 +73,11 @@ function objects:construct(world_recipe, objects_group, storage_object)
             elseif (body == c.TREASURE) then
 
                 object.happy_meter_gain = recipe.happy_meter_gain;
+
+            elseif (body == c.PORTAL) then
+
+                object.start_theta  = recipe.start_theta;
+                object.r            = recipe.r;
             end
         end
 
@@ -157,6 +162,23 @@ function objects:simulate_perspective(camera_offset)
 end
 
 ------------------------------------------------------------------
+
+function objects:update()
+
+    for i = 1, #container do
+
+        local object = container[i];
+
+        if (object.body == c.PORTAL) then
+
+            local elapsed_time = system.getTimer();
+            local theta = object.start_theta + elapsed_time / 10000;
+
+            object.x = object.r * math.cos(theta);
+            object.y = object.r * math.sin(theta);
+        end
+    end
+end
 
 function objects:check_collisions(fly)
 	

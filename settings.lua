@@ -22,12 +22,12 @@ settings.DEBUG_MODE 		= c.DEBUG_WITH_EVENT;
 
 settings.GAME_DURATION_IN_MINUTES      	= 1;           -- Minutes
 
-settings.FLY_SPEED 						= 2;
+settings.FLY_SPEED 						= 10;
 
 ------------------------------------------------------------------
 -- Location
 
-settings.LOCATION_TIME_TRESHOLD      	= 5;
+settings.LOCATION_TIME_TRESHOLD      	= 1;
 settings.LOCATION_DISTANCE_THRESHOLD   	= 0.00005;
 settings.LOCATION_STEP_SIZE            	= 100;
 

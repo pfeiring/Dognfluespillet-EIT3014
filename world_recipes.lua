@@ -140,9 +140,18 @@ local world_recipe_balloon = function()
 
 	index = index + 3;
 
+	-- Portals in circle around
 
+	n = 40;
 
-	world_recipe.objects[index + 1] = {file = 'portal.png', event = {type = c.PORTAL, world_name = c.WORLD_FLOWERS}, width = 127 * 0.8, height = 138 * 0.8, x = 3200 * 0.8 * 0.5, y = 0 };
+	for i = 1, n do
+		
+		theta = i / n * 2 * math.pi;
+		r 	  = 3600 * 0.8 * 0.5;
+
+		world_recipe.objects[index + i] = {file = 'portal.png', body = c.PORTAL, r = r, start_theta = theta, event = {type = c.PORTAL, world_name = c.WORLD_FLOWERS}, width = 127 * 0.8, height = 138 * 0.8, x = r * math.cos(theta), y = r * math.sin(theta) };
+	end
+	
 
 	return world_recipe;
 end
