@@ -313,64 +313,9 @@ function scene:create(event)
     UI:construct_happy_meter();
     UI:construct_compass();
 
-    ------------------------------------------------------------------
+    UI:construct_message_box(world_recipe.messages);
 
-    UI.message = {};
-    UI.message.index = -1;
-    UI.message.entry = -1;
-
-    UI.message_background = display.newImageRect(settings.IMAGE_FOLDER .. 'message_background.png', 640, 640);
-    UI.message_background.x = c.HALF_SCREEN_WIDTH;
-    UI.message_background.y = c.HALF_SCREEN_HEIGHT + 350;
-    UI.message_background.isVisible = false;
-
-    UI.message_text = display.newText({
-            text = '',
-            x = UI.message_background.x,
-            y = UI.message_background.y + 10,
-            width = 540,
-            font = 'PTMono-Regular',
-            fontSize = 32,
-            align = 'center'});
-    UI.message_text:setFillColor(0);
-    UI.message_text.isVisible = false;
-
-    function UI.message:event(event)
-
-        UI.message.entry = UI.message.entry + 1;
-
-        if (UI.message.index >= 1 and #world_recipe.messages[UI.message.index] >= UI.message.entry) then
-
-            local message = world_recipe.messages[UI.message.index];
-            local message_text = message[UI.message.entry];
-
-            UI.message_text.text = message_text;
-        else
-            UI.message.index = -1;
-            UI.message.entry = -1;
-
-            UI.message_background.isVisible = false;
-            UI.message_text.isVisible = false;
-        end
-
-        return true;
-    end
-
-    function UI:show_message(message_index)
-
-        UI.message.index = message_index;
-        UI.message.entry = 1;
-
-        local message = world_recipe.messages[UI.message.index];
-        local message_text = message[UI.message.entry];
-
-        UI.message_text.text = message_text;
-
-        UI.message_background.isVisible = true;
-        UI.message_text.isVisible = true;
-    end
-
-    UI.message_background:addEventListener('tap', UI.message.event);
+    UI.message_background:addEventListener('tap', UI.message_event);
 
     ------------------------------------------------------------------
 
@@ -413,6 +358,7 @@ function scene:show(event)
     elseif (phase == 'did') then
         
         addLocationListener();
+        
         Runtime:addEventListener('enterFrame', game_loop);
         Runtime:addEventListener('heading', game_loop);
     end

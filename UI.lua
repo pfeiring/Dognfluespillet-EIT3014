@@ -18,6 +18,10 @@ UI.happy_meter = {};
 
 UI.compass = {};
 
+UI.message = {};
+UI.message_background = {};
+UI.message_text = {};
+
 ------------------------------------------------------------------
 
 function UI:construct_backgrounds()
@@ -109,8 +113,66 @@ function UI:construct_compass()
     UI.compass.y = UI.background_right.y;
 end
 
+------------------------------------------------------------------
+-- Messages
+
+function UI:construct_message_box(world_recipe_messages)
+
+    UI.message.index = -1;
+    UI.message.entry = -1;
+
+    UI.message_background = display.newImageRect(settings.IMAGE_FOLDER .. 'message_background.png', 640, 640);
+    UI.message_background.x = c.HALF_SCREEN_WIDTH;
+    UI.message_background.y = c.HALF_SCREEN_HEIGHT + 350;
+    UI.message_background.isVisible = false;
+
+    UI.message_text = display.newText({
+            text = '',
+            x = UI.message_background.x,
+            y = UI.message_background.y + 10,
+            width = 540,
+            font = 'PTMono-Regular',
+            fontSize = 32,
+            align = 'center'});
+    UI.message_text:setFillColor(0);
+    UI.message_text.isVisible = false;
+
+    UI.message.world_recipe_messages = world_recipe_messages;
+end
+
+function UI.message_event(event)
+
+    UI.message.entry = UI.message.entry + 1;
+
+    if (UI.message.index >= 1 and #UI.message.world_recipe_messages[UI.message.index] >= UI.message.entry) then
+
+        local message = UI.message.world_recipe_messages[UI.message.index];
+        local message_text = message[UI.message.entry];
+
+        UI.message_text.text = message_text;
+    else
+        UI.message.index = -1;
+        UI.message.entry = -1;
+
+        UI.message_background.isVisible = false;
+        UI.message_text.isVisible = false;
+    end
+
+    return true;
+end
+
+function UI:show_message(message_index)
+
+    UI.message.index = message_index;
+    UI.message.entry = 1;
+
+    local message = UI.message.world_recipe_messages[UI.message.index];
+    local message_text = message[UI.message.entry];
+
+    UI.message_text.text = message_text;
+
+    UI.message_background.isVisible = true;
+    UI.message_text.isVisible = true;
+end
+
 return UI;
-
-
-
-
