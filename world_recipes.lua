@@ -40,7 +40,7 @@ local world_recipe_flowers = function()
 
 	------------------------------------------------------------------
 
-	world_recipe.objects[index + 1] = {file = 'crystals_c.jpeg', perspective_factor = 0.6, width = 3508 * 0.6, height = 2480 * 0.6, x = 0, y = 0}
+	world_recipe.objects[index + 1] = {file = 'crystals_c.jpg', perspective_factor = 0.6, width = 3508 * 0.6, height = 2480 * 0.6, x = 0, y = 0}
 
 	index = index + 1;
 
