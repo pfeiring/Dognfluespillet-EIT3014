@@ -23,6 +23,8 @@ local scene = composer.newScene();
 local world_name;
 local world_recipe;
 
+local storage_object = {};
+
 ------------------------------------------------------------------
 -- Scene group determines drawing order of groups
 -- Camera group determines drawing order of in game objects
@@ -183,17 +185,9 @@ end
 
 local game_loop = {};
 
-function game_loop:reset()
-
-    game_loop.changing_scene = false;
-
-    game_loop.portal_activated = nil;
-    game_loop.portal_link      = nil;
-end
-
 function game_loop:enterFrame(event)
 
-    if (not game_loop.changing_scene) then
+    if (not storage_object.changing_scene) then
 
         local timed_out = UI:update_clock();
         
@@ -213,26 +207,26 @@ function game_loop:enterFrame(event)
             Runtime:removeEventListener('enterFrame', game_loop);
             Runtime:removeEventListener('heading', game_loop);
 
-            game_loop.changing_scene = true;
+            storage_object.changing_scene = true;
             composer.gotoScene('scene_end');
 
-        elseif (game_loop.portal_activated) then
+        elseif (storage_object.portal_activated) then
             
             local goto_options = {
                 params  = 
                 {
-                    world_name = game_loop.portal_link
+                    world_name = storage_object.portal_world_name
                 }
             }
 
             Runtime:removeEventListener('enterFrame', game_loop);
             Runtime:removeEventListener('heading', game_loop);
 
-            game_loop.changing_scene = true;
+            storage_object.changing_scene = true;
             composer.gotoScene('scene_world', goto_options);
 
-            game_loop.portal_activated = nil;
-            game_loop.portal_link      = nil;
+            storage_object.portal_activated = nil;
+            storage_object.portal_world_name      = nil;
         end
     end
 end
@@ -282,9 +276,10 @@ function scene:create(event)
     world_name = event.params.world_name;
     world_recipe = world_recipes:get(world_name);
 
+    storage_object = {};
+
     ------------------------------------------------------------------
 
-    game_loop:reset();
     objects:reset();
 
     ------------------------------------------------------------------
@@ -330,7 +325,7 @@ function scene:create(event)
 
     ------------------------------------------------------------------
 
-    objects:construct(world_recipe, objects_group, game_loop);
+    objects:construct(world_recipe, objects_group, storage_object);
     objects:link();
 
     ------------------------------------------------------------------
@@ -358,7 +353,7 @@ function scene:show(event)
     elseif (phase == 'did') then
         
         addLocationListener();
-        
+
         Runtime:addEventListener('enterFrame', game_loop);
         Runtime:addEventListener('heading', game_loop);
     end

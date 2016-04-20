@@ -140,7 +140,7 @@ local world_recipe_balloon = function()
 
 	index = index + 3;
 
-	world_recipe.objects[index + 1] = {file = 'portal.png', event = {type = c.PORTAL, link = c.WORLD_FLOWERS}, width = 127 * 0.8, height = 138 * 0.8, x = 150 + 150, y = 550 - 60 };
+	world_recipe.objects[index + 1] = {file = 'portal.png', event = {type = c.PORTAL, world_name = c.WORLD_FLOWERS}, width = 127 * 0.8, height = 138 * 0.8, x = 150 + 150, y = 550 - 60 };
 
 	return world_recipe;
 end

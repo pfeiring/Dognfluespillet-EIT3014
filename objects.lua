@@ -20,7 +20,7 @@ end
 
 ------------------------------------------------------------------
 
-function objects:construct(world_recipe, objects_group, game_loop)
+function objects:construct(world_recipe, objects_group, storage_object)
 
 	for i = 1, #world_recipe.objects do
     
@@ -109,8 +109,8 @@ function objects:construct(world_recipe, objects_group, game_loop)
 
                 object.happy_meter = UI.happy_meter;
 
-                object.game_loop = game_loop;
-                object.link      = event.link;
+                object.storage_object = storage_object;
+                object.world_name     = event.world_name;
 
                 object:addEventListener('tap', events.portal_event);
             end

@@ -94,15 +94,15 @@ end
 function events.portal_event(event)
 
     local portal = event.target;
-    local game_loop = portal.game_loop;
+    local storage_object = portal.storage_object;
 
     if (not portal.taken) then
         portal.taken = true;
         UI:update_happy_meter(settings.HAPPY_METER_UPDATE_PORTAL);
     end
 
-    game_loop.portal_activated  = true;
-    game_loop.portal_link       = portal.link;
+    storage_object.portal_activated  = true;
+    storage_object.portal_world_name = portal.world_name;
 
     return true;
 end
