@@ -264,15 +264,20 @@ function game_loop:enterFrame(event)
 
         UI.clock:update();
         fly_update();
-        
+
         if (timed_out) then
             
             Runtime:removeEventListener('enterFrame', game_loop);
+            Runtime:removeEventListener('heading', game_loop);
 
             changing_scene = true;
             composer.gotoScene('scene_end');
         end
     end
+end
+
+function game_loop:heading(event)
+    UI.compass.rotation = event.magnetic;
 end
 
 ------------------------------------------------------------------
@@ -347,19 +352,19 @@ function scene:create(event)
 
     ------------------------------------------------------------------
 
-    UI.background = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_background.png', 176, 176);
-    UI.background.x = (176 / 2);
-    UI.background.y = (176 / 2);
+    UI.background_left = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_background.png', 176, 176);
+    UI.background_left.x = (176 / 2);
+    UI.background_left.y = (176 / 2);
+
+    UI.background_right = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_background.png', 176, 176);
+    UI.background_right.x = c.SCREEN_WIDTH - (176 / 2);
+    UI.background_right.y = (176 / 2);
 
     ------------------------------------------------------------------
 
     UI.clock = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_clock.png', 176, 176);
-    --UI.clock = display.newRect(0, 0, 50, 100);
-    UI.clock.x = UI.background.x;
-    UI.clock.y = UI.background.y;
-    --UI.clock:setFillColor(0, 1, 0);
-    --UI.clock.anchorX = 0;
-    --UI.clock.anchorY = 0;
+    UI.clock.x = UI.background_left.x;
+    UI.clock.y = UI.background_left.y;
     UI.clock.yScale = 1;
     UI.clock.start_time = os.time();
 
@@ -381,14 +386,14 @@ function scene:create(event)
     ------------------------------------------------------------------
 
     UI.happy_meter_background = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_happy_meter_background.png', 176, 176);
-    UI.happy_meter_background.x = UI.background.x;
-    UI.happy_meter_background.y = UI.background.y;
+    UI.happy_meter_background.x = UI.background_left.x;
+    UI.happy_meter_background.y = UI.background_left.y;
 
     ------------------------------------------------------------------
 
     UI.happy_meter = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_happy_meter_2.png', 76, 76);
-    UI.happy_meter.x = UI.background.x;
-    UI.happy_meter.y = UI.background.y;
+    UI.happy_meter.x = UI.background_left.x;
+    UI.happy_meter.y = UI.background_left.y;
     UI.happy_meter.value = settings.HAPPY_METER_START_SCALE;
 
     UI.happy_meter_mask = graphics.newMask(settings.IMAGE_FOLDER .. 'UI_happy_meter_mask.png');
@@ -463,10 +468,18 @@ function scene:create(event)
 
     ------------------------------------------------------------------
 
-    UI_group:insert(UI.background);
+    UI.compass = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_compass.png', 176, 176);
+    UI.compass.x = UI.background_right.x;
+    UI.compass.y = UI.background_right.y;
+
+    ------------------------------------------------------------------
+
+    UI_group:insert(UI.background_left);
+    UI_group:insert(UI.background_right);
     UI_group:insert(UI.clock);
     UI_group:insert(UI.happy_meter_background);
     UI_group:insert(UI.happy_meter);
+    UI_group:insert(UI.compass);
     UI_group:insert(UI.message_background);
     UI_group:insert(UI.message_text);
 
@@ -646,6 +659,7 @@ function scene:show(event)
         
         addLocationListener();
         Runtime:addEventListener('enterFrame', game_loop);
+        Runtime:addEventListener('heading', game_loop);
     end
 end
 
