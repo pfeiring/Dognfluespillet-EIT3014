@@ -306,7 +306,10 @@ function scene:create(event)
     ------------------------------------------------------------------
 
     UI:construct_backgrounds();
+
     UI:construct_clock();
+    UI:update_clock();
+
     UI:construct_happy_meter();
     UI:construct_compass();
 
@@ -408,7 +411,7 @@ function scene:show(event)
     -- Example: start timers, begin animation, play audio, etc.
 
     elseif (phase == 'did') then
-        print('adsasdsad...')
+        
         addLocationListener();
         Runtime:addEventListener('enterFrame', game_loop);
         Runtime:addEventListener('heading', game_loop);

@@ -60,7 +60,7 @@ function scene:show(event)
 
     if (phase == "will") then
 
-        
+        UI:reset_clock();
 
     -- Called when the scene is now on screen
     -- Insert code here to make the scene come alive

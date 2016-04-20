@@ -40,13 +40,16 @@ function UI:construct_clock()
     UI.clock.x = UI.background_left.x;
     UI.clock.y = UI.background_left.y;
     UI.clock.yScale = 1;
-    UI.clock.start_time = os.time();
+
+    if (not UI.clock_start_time) then
+    	UI.clock_start_time = os.time();
+    end
 end
 
-function UI:update_clock(self)
+function UI:update_clock()
 
     local current_time = os.time();
-    local elapsed_time = current_time - UI.clock.start_time;
+    local elapsed_time = current_time - UI.clock_start_time;
     
     local timed_out;
 
@@ -62,6 +65,10 @@ function UI:update_clock(self)
     end
 
     return timed_out;
+end
+
+function UI:reset_clock()
+	UI.clock_start_time = nil;
 end
 
 ------------------------------------------------------------------
