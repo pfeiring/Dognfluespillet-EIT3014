@@ -138,6 +138,10 @@ local world_recipe_balloon = function()
 	world_recipe.objects[index + 2] = {rectangle = true, body = c.MESSAGE, invisible = true, alpha = 0.4, message_index = 2, width = 200, height = 1000, fill_color = {0, 0, 1}, x = 500,  y = 400};
 	world_recipe.objects[index + 3] = {rectangle = true, body = c.MESSAGE, invisible = true, alpha = 0.4, message_index = 3, width = 500, height = 700, fill_color = {0, 0, 1}, x = -500,  y = -400};
 
+	index = index + 3;
+
+	world_recipe.objects[index + 1] = {file = 'portal.png', event = {type = c.PORTAL}, width = 127 * 0.8, height = 138 * 0.8, x = 150 + 150, y = 550 - 60 };
+
 	return world_recipe;
 end
 

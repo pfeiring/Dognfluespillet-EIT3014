@@ -88,4 +88,18 @@ function events.activator_event(event)
     return true;
 end
 
+------------------------------------------------------------------
+
+function events.portal_event(event)
+
+    local portal = event.target;
+
+    if (not portal.taken) then
+        portal.taken = true;
+        portal.happy_meter:update(settings.HAPPY_METER_UPDATE_PORTAL);
+    end
+
+    return true;
+end
+
 return events;

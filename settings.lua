@@ -35,9 +35,10 @@ settings.LOCATION_STEP_SIZE            	= 100;
 
 settings.HAPPY_METER_START_SCALE 		= 0.5;
 
-settings.HAPPY_METER_UPDATE_BALLOON 	= 0.1;
-settings.HAPPY_METER_UPDATE_WAVE 		= 0.05;
-settings.HAPPY_METER_UPDATE_ACTIVATOR 	= 0.1;
+settings.HAPPY_METER_UPDATE_BALLOON 	= 0.04;
+settings.HAPPY_METER_UPDATE_WAVE 		= 0.02;
+settings.HAPPY_METER_UPDATE_ACTIVATOR 	= 0.04;
+settings.HAPPY_METER_UPDATE_PORTAL 		= 0.2;
 
 ------------------------------------------------------------------
 -- Camera

@@ -23,7 +23,6 @@ local world_recipe;
 
 ------------------------------------------------------------------
 
-local timed_out = false;
 local changing_scene = false;
 
 ------------------------------------------------------------------
@@ -262,7 +261,7 @@ function game_loop:enterFrame(event)
 
     if (not changing_scene) then
 
-        UI.clock:update();
+        timed_out = UI.clock:update();
         fly_update();
 
         if (timed_out) then
@@ -326,7 +325,6 @@ function scene:create(event)
 
     ------------------------------------------------------------------
 
-    timed_out = false;
     changing_scene = false;
 
     ------------------------------------------------------------------
@@ -373,6 +371,8 @@ function scene:create(event)
         local current_time = os.time();
         local elapsed_time = current_time - UI.clock.start_time;
         
+        local timed_out;
+
         if (elapsed_time >= (settings.GAME_DURATION_IN_MINUTES * 60)) then
             UI.clock.rotation = 360;
             UI.clock.isVisible = false;
@@ -380,7 +380,11 @@ function scene:create(event)
             timed_out = true;
         else
             UI.clock.rotation = 360 * (elapsed_time / (settings.GAME_DURATION_IN_MINUTES * 60));
+
+            timed_out = false;
         end
+
+        return timed_out;
     end
 
     ------------------------------------------------------------------
