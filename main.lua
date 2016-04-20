@@ -17,5 +17,5 @@ local goto_options = {
 	}
 }
 
-composer.gotoScene('scene_world', goto_options);
---composer.gotoScene('scene_intro', goto_options);
+--composer.gotoScene('scene_world', goto_options);
+composer.gotoScene('scene_intro', goto_options);

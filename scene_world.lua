@@ -239,7 +239,7 @@ function game_loop:enterFrame(event)
             Runtime:removeEventListener('heading', game_loop);
 
             storage_object.changing_scene = true;
-            composer.gotoScene('scene_end');
+            composer.gotoScene('scene_death');
 
         elseif (storage_object.portal_activated) then
             

@@ -17,23 +17,41 @@ local scene = composer.newScene();
 
 local video;
 
+local remembered_scene_event;
+
 ------------------------------------------------------------------
 
 function scene:create(event)
 
     local scene_group = self.view;
 
+    display.setDefault('background', 0, 0, 0);
+
     ------------------------------------------------------------------
 
-    video = native.newVideo( display.contentCenterX, display.contentCenterY, 320, 480 )
+    -- These values are madness, but seam to work.
+    video = native.newVideo( display.contentCenterX, display.contentCenterY*2, math.floor(display.contentWidth*9/16)*2, display.contentWidth*2 )
 
     local function videoListener( event )
         print( "Event phase: " .. event.phase )
+
+        if event.phase == 'ended' then
+
+            video:pause()
+            video:removeSelf()
+            video = nil
+
+            display.setDefault('background', 1, 1, 1);
+
+            composer.gotoScene('scene_world', remembered_scene_event);
+        end
 
         if event.errorCode then
             native.showAlert( "Error!", event.errorMessage, { "OK" } )
         end
     end
+    
+
 
     -- Load a video
     video:load(settings.VIDEO_FOLDER .. "intro.avi", system.DocumentsDirectory )
@@ -75,14 +93,21 @@ function scene:show(event)
     local scene_group = self.view;
     local phase = event.phase;
 
+    remembered_scene_event = event;
+
     -- Called when the scene is still off screen (but is about to come on screen)
 
     if (phase == "will") then
 
-        print('playing...')
-        video:play()
-        print('after')
-        composer.gotoScene('scene_world', event);
+        if system.getInfo("environment") == "simulator" then
+            print(display.contentCenterY)
+            display.setDefault('background', 1, 1, 1);
+            composer.gotoScene('scene_world', event);
+        else
+            video:play()
+        end
+
+        --composer.gotoScene('scene_world', event);
     -- Called when the scene is now on screen
     -- Insert code here to make the scene come alive
     -- Example: start timers, begin animation, play audio, etc.
