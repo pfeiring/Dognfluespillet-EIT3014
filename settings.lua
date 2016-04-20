@@ -13,13 +13,13 @@ settings.IMAGE_FOLDER       = 'images/';
 ------------------------------------------------------------------
 -- Debug
 
-settings.DEBUG 				= false;
+settings.DEBUG 				= true;
 settings.DEBUG_MODE 		= c.DEBUG_WITH_EVENT;
 
 ------------------------------------------------------------------
 -- Basics
 
-settings.GAME_DURATION_IN_MINUTES      	= 15;           -- Minutes
+settings.GAME_DURATION_IN_MINUTES      	= 10;           -- Minutes
 
 settings.FLY_SPEED 						= 2;
 
