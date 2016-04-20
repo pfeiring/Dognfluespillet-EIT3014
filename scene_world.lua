@@ -184,7 +184,11 @@ end
 local game_loop = {};
 
 function game_loop:reset()
+
     game_loop.changing_scene = false;
+
+    game_loop.portal_activated = nil;
+    game_loop.portal_link      = nil;
 end
 
 function game_loop:enterFrame(event)
@@ -192,7 +196,7 @@ function game_loop:enterFrame(event)
     if (not game_loop.changing_scene) then
 
         local timed_out = UI:update_clock();
-
+        
         ------------------------------------------------------------------
 
         fly:update();
@@ -213,7 +217,7 @@ function game_loop:enterFrame(event)
             composer.gotoScene('scene_end');
 
         elseif (game_loop.portal_activated) then
-
+            
             local goto_options = {
                 params  = 
                 {
@@ -226,6 +230,9 @@ function game_loop:enterFrame(event)
 
             game_loop.changing_scene = true;
             composer.gotoScene('scene_world', goto_options);
+
+            game_loop.portal_activated = nil;
+            game_loop.portal_link      = nil;
         end
     end
 end
@@ -401,7 +408,7 @@ function scene:show(event)
     -- Example: start timers, begin animation, play audio, etc.
 
     elseif (phase == 'did') then
-        
+        print('adsasdsad...')
         addLocationListener();
         Runtime:addEventListener('enterFrame', game_loop);
         Runtime:addEventListener('heading', game_loop);
