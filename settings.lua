@@ -44,7 +44,7 @@ settings.HAPPY_METER_UPDATE_PORTAL 		= 0.2;
 ------------------------------------------------------------------
 -- Camera
 
-settings.CAMERA_MODE 			  = c.BOX;
+settings.CAMERA_MODE 			  = c.SIMPLE;
 settings.CAMERA_TARGET_POSITION_X = c.HALF_SCREEN_WIDTH;
 settings.CAMERA_TARGET_POSITION_Y = c.HALF_SCREEN_HEIGHT;
 

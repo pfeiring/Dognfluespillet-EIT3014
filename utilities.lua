@@ -23,6 +23,4 @@ function utilities:conditioned_value_or_default(condition, value, default)
     return default;
 end
 
-------------------------------------------------------------------
-
 return utilities;

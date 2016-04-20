@@ -94,7 +94,7 @@ local world_recipe_balloon = function()
 	world_recipe.messages[1] =  {
 	                    			'Hadde jeg levd lenger enn et døgn så skulle jeg ha flydd en av disse ballongene.'
 	                			};
-	world_recipe.messages[2] =   {
+	world_recipe.messages[2] =  {
 	                   			 	'Jeg tror jeg ser et fyrtårn der borte!',
 	                    			'Skal vi dra dit?'
 	                			};
@@ -140,7 +140,7 @@ local world_recipe_balloon = function()
 
 	index = index + 3;
 
-	world_recipe.objects[index + 1] = {file = 'portal.png', event = {type = c.PORTAL}, width = 127 * 0.8, height = 138 * 0.8, x = 150 + 150, y = 550 - 60 };
+	world_recipe.objects[index + 1] = {file = 'portal.png', event = {type = c.PORTAL, link = c.WORLD_FLOWERS}, width = 127 * 0.8, height = 138 * 0.8, x = 150 + 150, y = 550 - 60 };
 
 	return world_recipe;
 end

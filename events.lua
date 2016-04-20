@@ -3,7 +3,8 @@ local events = {};
 
 ------------------------------------------------------------------
 
-local settings = require('settings');
+local settings  = require('settings');
+local UI        = require('UI');
 
 ------------------------------------------------------------------
 
@@ -13,7 +14,7 @@ function events.balloon_event(event)
 
     if (not balloon.taken) then
         balloon.taken = true;
-        balloon.happy_meter:update(settings.HAPPY_METER_UPDATE_BALLOON);
+        UI:update_happy_meter(settings.HAPPY_METER_UPDATE_BALLOON);
     end
 
     if (not balloon.in_transition) then
@@ -52,7 +53,7 @@ function events.wave_event(event)
 
     if (not wave.taken) then
         wave.taken = true;
-        wave.happy_meter:update(settings.HAPPY_METER_UPDATE_WAVE);
+        UI:update_happy_meter(settings.HAPPY_METER_UPDATE_WAVE);
     end
 
     if (not wave.in_transition) then
@@ -80,7 +81,7 @@ function events.activator_event(event)
 
     if (not activator.taken) then
         activator.taken = true;
-        activator.happy_meter:update(settings.HAPPY_METER_UPDATE_ACTIVATOR);
+        UI:update_happy_meter(settings.HAPPY_METER_UPDATE_ACTIVATOR);
     end
 
     target.isVisible = not target.isVisible;
@@ -93,11 +94,15 @@ end
 function events.portal_event(event)
 
     local portal = event.target;
+    local game_loop = portal.game_loop;
 
     if (not portal.taken) then
         portal.taken = true;
-        portal.happy_meter:update(settings.HAPPY_METER_UPDATE_PORTAL);
+        UI:update_happy_meter(settings.HAPPY_METER_UPDATE_PORTAL);
     end
+
+    game_loop.portal_activated  = true;
+    game_loop.portal_link       = portal.link;
 
     return true;
 end
