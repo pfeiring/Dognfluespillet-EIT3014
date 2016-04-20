@@ -183,6 +183,36 @@ end
 
 ------------------------------------------------------------------
 
+local addLocationListener = function()
+
+    if (settings.DEBUG) then
+
+        if (settings.DEBUG_MODE == c.DEBUG_WITH_EVENT) then
+            debug_with_event_detector:addEventListener('tap', debug_handler_event);
+        else
+            debug_with_data_timer = timer.performWithDelay(50, debug_handler_data, -1);
+        end
+    else
+        Runtime:addEventListener('location', location_handler);
+    end
+end
+
+local removeLocationListener = function()
+
+    if (settings.DEBUG) then
+
+        if (settings.DEBUG_MODE == c.DEBUG_WITH_EVENT) then
+            debug_with_event_detector:removeEventListener('tap', debug_handler_event);
+        else
+            timer.cancel(debug_with_data_timer);
+        end
+    else
+        Runtime:removeEventListener('location', location_handler);
+    end
+end
+
+------------------------------------------------------------------
+
 local game_loop = {};
 
 function game_loop:enterFrame(event)
@@ -233,36 +263,6 @@ end
 
 function game_loop:heading(event)
     UI.compass.rotation = event.magnetic;
-end
-
-------------------------------------------------------------------
-
-local addLocationListener = function()
-
-    if (settings.DEBUG) then
-
-        if (settings.DEBUG_MODE == c.DEBUG_WITH_EVENT) then
-            debug_with_event_detector:addEventListener('tap', debug_handler_event);
-        else
-            debug_with_data_timer = timer.performWithDelay(50, debug_handler_data, -1);
-        end
-    else
-        Runtime:addEventListener('location', location_handler);
-    end
-end
-
-local removeLocationListener = function()
-
-    if (settings.DEBUG) then
-
-        if (settings.DEBUG_MODE == c.DEBUG_WITH_EVENT) then
-            debug_with_event_detector:removeEventListener('tap', debug_handler_event);
-        else
-            timer.cancel(debug_with_data_timer);
-        end
-    else
-        Runtime:removeEventListener('location', location_handler);
-    end
 end
 
 ------------------------------------------------------------------

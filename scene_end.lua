@@ -10,6 +10,7 @@ local world_recipes = require('world_recipes');
 local collision     = require('collision');
 local events        = require('events');
 local camera        = require('camera');
+local UI            = require('UI');
 
 ------------------------------------------------------------------
 
