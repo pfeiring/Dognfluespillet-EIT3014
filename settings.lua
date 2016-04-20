@@ -9,6 +9,7 @@ local c = require('c');
 -- Assets
 
 settings.IMAGE_FOLDER       = 'images/';
+settings.VIDEO_FOLDER		= 'videos/';
 
 ------------------------------------------------------------------
 -- Debug

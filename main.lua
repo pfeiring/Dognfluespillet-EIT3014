@@ -15,4 +15,5 @@ local goto_options = {
 		world_name = c.WORLD_BALLOON	}
 }
 
-composer.gotoScene('scene_world', goto_options);
+--composer.gotoScene('scene_world', goto_options);
+composer.gotoScene('scene_intro', goto_options);
