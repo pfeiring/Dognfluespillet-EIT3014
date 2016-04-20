@@ -10,21 +10,20 @@ local world_recipes = require('world_recipes');
 local collision     = require('collision');
 local events        = require('events');
 local camera        = require('camera');
+local UI            = require('UI');
+local objects       = require('objects');
+local fly           = require('fly');
 
 ------------------------------------------------------------------
 
 local scene = composer.newScene();
 
 ------------------------------------------------------------------
--- Forward references
 
 local world_name;
 local world_recipe;
 
-------------------------------------------------------------------
-
-local timed_out = false;
-local changing_scene = false;
+local storage_object = {};
 
 ------------------------------------------------------------------
 -- Scene group determines drawing order of groups
@@ -39,10 +38,6 @@ local UI_group;
 
 ------------------------------------------------------------------
 
-local UI;
-local objects;
-
-local fly;
 local fly_destination;
 
 ------------------------------------------------------------------
@@ -118,9 +113,7 @@ local location_handler = function(event)
         -- Move world
 
         if (movement.valid) then
-
-            fly_destination.x = fly.x + settings.LOCATION_STEP_SIZE * math.cos(movement.direction);
-            fly_destination.y = fly.y - settings.LOCATION_STEP_SIZE * math.sin(movement.direction);
+            fly:add_to_destination(settings.LOCATION_STEP_SIZE * math.cos(movement.direction), -settings.LOCATION_STEP_SIZE * math.sin(movement.direction));
         end
     end
 end
@@ -190,98 +183,6 @@ end
 
 ------------------------------------------------------------------
 
-local fly_update = function()
-    
-    local delta_x = fly_destination.x - fly.x;
-    local delta_y = fly_destination.y - fly.y;
-    
-    local alpha = math.atan2(-delta_y, delta_x);
-
-    local delta_speed = (delta_x * delta_x) + (delta_y * delta_y);
-
-    local step_x;
-    local step_y;
-
-    if (delta_speed < (settings.FLY_SPEED * settings.FLY_SPEED)) then
-        step_x = math.sqrt(delta_speed) * math.cos(alpha);
-        step_y = math.sqrt(delta_speed) * math.sin(alpha);
-    else
-        step_x = settings.FLY_SPEED * math.cos(alpha);
-        step_y = settings.FLY_SPEED * math.sin(alpha);
-    end
-
-    fly.x = fly.x + step_x;
-    fly.y = fly.y - step_y;
-
-    if (step_x > 0.01 * settings.FLY_SPEED) then
-        fly.xScale = -0.4;
-    elseif (step_x < -0.01 * settings.FLY_SPEED) then
-        fly.xScale = 0.4;
-    end
-
-    local offset = camera:update(camera_group, fly, world_recipe.frame, world_recipe.objects);
-    
-    -- Adjust position of objects that simulate perspective offset
-
-    for i = 1, #objects do
-
-        local object = objects[i];
-        
-        if (object.perspective_factor) then
-            
-            transition.to( object, {time=0, x = - (offset.x * object.perspective_factor), y = - (offset.y * object.perspective_factor)})
-        end
-    end
-
-    -- Collision checks
-
-    for i = 1, #objects do
-
-        local object = objects[i];
-        
-        if (object.body == c.MESSAGE and not object.taken and collision:box(fly, object)) then
-            
-            object.taken = true;
-            UI.message:show(object.message_index);
-
-        elseif (object.body == c.TREASURE and not object.taken and collision:box(fly, object)) then
-
-            object.taken = true;
-            object.isVisible = false;
-
-            UI.happy_meter:update(object.happy_meter_gain);
-        end
-    end
-end
-
-------------------------------------------------------------------
-
-local game_loop = {};
-
-function game_loop:enterFrame(event)
-
-    if (not changing_scene) then
-
-        UI.clock:update();
-        fly_update();
-
-        if (timed_out) then
-            
-            Runtime:removeEventListener('enterFrame', game_loop);
-            Runtime:removeEventListener('heading', game_loop);
-
-            changing_scene = true;
-            composer.gotoScene('scene_end');
-        end
-    end
-end
-
-function game_loop:heading(event)
-    UI.compass.rotation = event.magnetic;
-end
-
-------------------------------------------------------------------
-
 local addLocationListener = function()
 
     if (settings.DEBUG) then
@@ -312,32 +213,83 @@ end
 
 ------------------------------------------------------------------
 
+local game_loop = {};
+
+function game_loop:enterFrame(event)
+
+    if (not storage_object.changing_scene) then
+
+        local timed_out = UI:update_clock();
+        
+        ------------------------------------------------------------------
+
+        fly:update();
+        
+        local camera_offset = camera:update(camera_group, fly:get_position(), world_recipe.frame);
+
+        objects:simulate_perspective(camera_offset);
+        objects:check_collisions(fly:get_object());
+
+        ------------------------------------------------------------------
+
+        if (timed_out) then
+            
+            Runtime:removeEventListener('enterFrame', game_loop);
+            Runtime:removeEventListener('heading', game_loop);
+
+            storage_object.changing_scene = true;
+            composer.gotoScene('scene_end');
+
+        elseif (storage_object.portal_activated) then
+            
+            local goto_options = {
+                params  = 
+                {
+                    world_name = storage_object.portal_world_name
+                }
+            }
+
+            Runtime:removeEventListener('enterFrame', game_loop);
+            Runtime:removeEventListener('heading', game_loop);
+
+            storage_object.changing_scene = true;
+            composer.gotoScene('scene_world', goto_options);
+
+            storage_object.portal_activated = nil;
+            storage_object.portal_world_name      = nil;
+        end
+    end
+end
+
+function game_loop:heading(event)
+    UI.compass.rotation = event.magnetic;
+end
+
+------------------------------------------------------------------
+
 function scene:create(event)
 
     local scene_group = self.view;
-
-    -- Initialize the scene here
-    -- Example: add display objects to "scene_group", add touch listeners, etc.
 
     ------------------------------------------------------------------
 
     world_name = event.params.world_name;
     world_recipe = world_recipes:get(world_name);
 
-    ------------------------------------------------------------------
-
-    timed_out = false;
-    changing_scene = false;
+    storage_object = {};
 
     ------------------------------------------------------------------
-    -- Group setup
 
-    background_group = display.newGroup();
-    objects_group = display.newGroup();
-    fly_group = display.newGroup();
-    camera_group = display.newGroup();
+    objects:reset();
 
-    UI_group = display.newGroup();
+    ------------------------------------------------------------------
+
+    background_group    = display.newGroup();
+    objects_group       = display.newGroup();
+    fly_group           = display.newGroup();
+    camera_group        = display.newGroup();
+
+    UI_group            = display.newGroup();
 
     camera_group:insert(background_group);
     camera_group:insert(objects_group);
@@ -348,129 +300,17 @@ function scene:create(event)
 
     ------------------------------------------------------------------
 
-    UI = {};
+    UI:construct_backgrounds();
 
-    ------------------------------------------------------------------
+    UI:construct_clock();
+    UI:update_clock();
 
-    UI.background_left = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_background.png', 176, 176);
-    UI.background_left.x = (176 / 2);
-    UI.background_left.y = (176 / 2);
+    UI:construct_happy_meter();
+    UI:construct_compass();
 
-    UI.background_right = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_background.png', 176, 176);
-    UI.background_right.x = c.SCREEN_WIDTH - (176 / 2);
-    UI.background_right.y = (176 / 2);
+    UI:construct_message_box(world_recipe.messages);
 
-    ------------------------------------------------------------------
-
-    UI.clock = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_clock.png', 176, 176);
-    UI.clock.x = UI.background_left.x;
-    UI.clock.y = UI.background_left.y;
-    UI.clock.yScale = 1;
-    UI.clock.start_time = os.time();
-
-    function UI.clock:update(self)
-
-        local current_time = os.time();
-        local elapsed_time = current_time - UI.clock.start_time;
-        
-        if (elapsed_time >= (settings.GAME_DURATION_IN_MINUTES * 60)) then
-            UI.clock.rotation = 360;
-            UI.clock.isVisible = false;
-
-            timed_out = true;
-        else
-            UI.clock.rotation = 360 * (elapsed_time / (settings.GAME_DURATION_IN_MINUTES * 60));
-        end
-    end
-
-    ------------------------------------------------------------------
-
-    UI.happy_meter_background = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_happy_meter_background.png', 176, 176);
-    UI.happy_meter_background.x = UI.background_left.x;
-    UI.happy_meter_background.y = UI.background_left.y;
-
-    ------------------------------------------------------------------
-
-    UI.happy_meter = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_happy_meter_2.png', 76, 76);
-    UI.happy_meter.x = UI.background_left.x;
-    UI.happy_meter.y = UI.background_left.y;
-    UI.happy_meter.value = settings.HAPPY_METER_START_SCALE;
-
-    UI.happy_meter_mask = graphics.newMask(settings.IMAGE_FOLDER .. 'UI_happy_meter_mask.png');
-    UI.happy_meter:setMask(UI.happy_meter_mask);
-
-    UI.happy_meter.maskY = 76 * (1 - UI.happy_meter.value);
-
-    function UI.happy_meter:update(increase)
-
-        UI.happy_meter.value = math.min(1, UI.happy_meter.value + increase);
-        UI.happy_meter.maskY = 76 * (1 - UI.happy_meter.value);
-    end
-
-    ------------------------------------------------------------------
-
-    UI.message = {};
-    UI.message.index = -1;
-    UI.message.entry = -1;
-
-    UI.message_background = display.newImageRect(settings.IMAGE_FOLDER .. 'message_background.png', 640, 640);
-    UI.message_background.x = c.HALF_SCREEN_WIDTH;
-    UI.message_background.y = c.HALF_SCREEN_HEIGHT + 350;
-    UI.message_background.isVisible = false;
-
-    UI.message_text = display.newText({
-            text = '',
-            x = UI.message_background.x,
-            y = UI.message_background.y + 10,
-            width = 540,
-            font = 'PTMono-Regular',
-            fontSize = 32,
-            align = 'center'});
-    UI.message_text:setFillColor(0);
-    UI.message_text.isVisible = false;
-
-    function UI.message:event(event)
-
-        UI.message.entry = UI.message.entry + 1;
-
-        if (#world_recipe.messages[UI.message.index] >= UI.message.entry) then
-
-            local message = world_recipe.messages[UI.message.index];
-            local message_text = message[UI.message.entry];
-
-            UI.message_text.text = message_text;
-        else
-            UI.message.index = -1;
-            UI.message.entry = -1;
-
-            UI.message_background.isVisible = false;
-            UI.message_text.isVisible = false;
-        end
-
-        return true;
-    end
-
-    function UI.message:show(message_index)
-
-        UI.message.index = message_index;
-        UI.message.entry = 1;
-
-        local message = world_recipe.messages[UI.message.index];
-        local message_text = message[UI.message.entry];
-
-        UI.message_text.text = message_text;
-
-        UI.message_background.isVisible = true;
-        UI.message_text.isVisible = true;
-    end
-
-    UI.message_background:addEventListener('tap', UI.message.event);
-
-    ------------------------------------------------------------------
-
-    UI.compass = display.newImageRect(settings.IMAGE_FOLDER .. 'UI_compass.png', 176, 176);
-    UI.compass.x = UI.background_right.x;
-    UI.compass.y = UI.background_right.y;
+    UI.message_background:addEventListener('tap', UI.message_event);
 
     ------------------------------------------------------------------
 
@@ -484,158 +324,13 @@ function scene:create(event)
     UI_group:insert(UI.message_text);
 
     ------------------------------------------------------------------
-    
-    objects = {};
 
-    for i = 1, #world_recipe.objects do
-    
-        local recipe = world_recipe.objects[i];
-        local object;
-
-        -- Asset
-
-        if (recipe.rectangle) then
-            object = display.newRect(0, 0, recipe.width, recipe.height);
-        else
-            object = display.newImageRect(settings.IMAGE_FOLDER .. recipe.file, recipe.width, recipe.height);
-        end
-
-        if (recipe.invisible) then
-            object.isVisible = false;
-        end
-
-        if (recipe.fill_color) then
-            object:setFillColor(unpack(recipe.fill_color));
-        end
-
-        object.alpha = utilities:conditioned_value_or_default(recipe.alpha, recipe.alpha, 1);
-        
-        -- Object
-
-        object.x = recipe.x;
-        object.y = recipe.y;
-        
-        object.id = recipe.id;
-        object.link = recipe.link;
-
-        object.body = recipe.body;
-        object.direction = recipe.direction;
-        object.perspective_factor = recipe.perspective_factor;
-
-        objects[#objects + 1] = object;
-        objects_group:insert(object);
-
-        -- Collision
-
-        if (recipe.body) then
-
-            local body = recipe.body;
-
-            if (body == c.MESSAGE) then
-                
-                object.message_index = recipe.message_index;
-
-            elseif (body == c.TREASURE) then
-
-                object.happy_meter_gain = recipe.happy_meter_gain;
-            end
-        end
-
-        -- Events
-
-        if (recipe.event) then
-            
-            local event = recipe.event;
-            
-            if (event.type == c.BALLOON) then
-
-                object.happy_meter = UI.happy_meter;
-
-                object.offset = {};
-                object.offset.x = event.offset.x;
-                object.offset.y = event.offset.y;
-                
-                object:addEventListener('tap', events.balloon_event);
-
-            elseif (event.type == c.WAVE) then
-
-                object.happy_meter = UI.happy_meter;
-
-                object:addEventListener('tap', events.wave_event);
-
-            elseif (event.type == c.ACTIVATOR) then
-
-                object.happy_meter = UI.happy_meter;
-                
-                object.isHitTestable = true;
-                object:addEventListener('tap', events.activator_event);
-            end
-        end
-    end
-
-    ------------------------------------------------------------------
-    -- Setup links between objects
-
-    for i = 1, #objects do
-
-        local object = objects[i];
-        
-        if (object.link) then
-
-            for j = 1, #objects do
-
-                local target = objects[j];
-                
-                if (target.id and target.id == object.link) then
-                    
-                    object.link = target;
-                end
-            end
-        end
-    end
+    objects:construct(world_recipe, objects_group, storage_object);
+    objects:link();
 
     ------------------------------------------------------------------
 
-    local sheetOptions = 
-    {
-        width = 657,
-        height = 626,
-        numFrames = 9,
-        sheetContentWidth = 5921,
-        sheetContentHeight = 626
-    }
-    
-    local sheet_flyingFly = graphics.newImageSheet(settings.IMAGE_FOLDER .. 'sprite_fly.png', sheetOptions )
-    
-    local sequences_flyingFly = {
-        -- consecutive frames sequence
-        {
-            name = 'normalFlying',
-            start = 1,
-            count = 9,
-            time = 1000,
-            loopCount = 0,
-            loopDirection = 'forward'
-        }
-    }    
-
-    fly = display.newSprite( sheet_flyingFly, sequences_flyingFly )
-
-    --fly = display.newImageRect(settings.IMAGE_FOLDER .. 'fly.png', 260, 251);
-    
-    fly.x = world_recipe.starting_point.x;
-    fly.y = world_recipe.starting_point.y;
-
-    fly.xScale = -0.4;
-    fly.yScale = 0.4;
-
-    fly_group:insert(fly);
-
-    fly_destination = {};
-    fly_destination.x = fly.x;
-    fly_destination.y = fly.y;
-
-    fly:play()
+    fly:construct(world_recipe, fly_group);
 end
 
 ------------------------------------------------------------------
@@ -647,17 +342,18 @@ function scene:show(event)
 
     -- Called when the scene is still off screen (but is about to come on screen)
 
-    if (phase == "will") then
+    if (phase == 'will') then
 
-        camera:update(camera_group, fly, world_recipe.frame);
+        camera:update(camera_group, fly:get_position(), world_recipe.frame);
 
     -- Called when the scene is now on screen
     -- Insert code here to make the scene come alive
     -- Example: start timers, begin animation, play audio, etc.
 
-    elseif (phase == "did") then
+    elseif (phase == 'did') then
         
         addLocationListener();
+
         Runtime:addEventListener('enterFrame', game_loop);
         Runtime:addEventListener('heading', game_loop);
     end
@@ -674,15 +370,15 @@ function scene:hide(event)
     -- Insert code here to "pause" the scene
     -- Example: stop timers, stop animation, stop audio, etc.
 
-    if (phase == "will") then
+    if (phase == 'will') then
 
         removeLocationListener();
 
     -- Called immediately after scene goes off screen
 
-    elseif (phase == "did") then
+    elseif (phase == 'did') then
         
-        composer.removeScene('world');
+        composer.removeScene('scene_world');
     end
 end
 

@@ -31,6 +31,7 @@ c.TREASURE      = 'treasure';
 c.WAVE          = 'wave';
 c.ACTIVATOR     = 'activator';
 c.MESSAGE       = 'message';
+c.PORTAL        = 'portal';
 
 ------------------------------------------------------------------
 -- Camera

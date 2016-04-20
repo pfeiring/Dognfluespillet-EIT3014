@@ -20,7 +20,7 @@ settings.DEBUG_MODE 		= c.DEBUG_WITH_EVENT;
 ------------------------------------------------------------------
 -- Basics
 
-settings.GAME_DURATION_IN_MINUTES      	= 10;           -- Minutes
+settings.GAME_DURATION_IN_MINUTES      	= 1;           -- Minutes
 
 settings.FLY_SPEED 						= 2;
 
@@ -36,14 +36,15 @@ settings.LOCATION_STEP_SIZE            	= 100;
 
 settings.HAPPY_METER_START_SCALE 		= 0.5;
 
-settings.HAPPY_METER_UPDATE_BALLOON 	= 0.1;
-settings.HAPPY_METER_UPDATE_WAVE 		= 0.05;
-settings.HAPPY_METER_UPDATE_ACTIVATOR 	= 0.1;
+settings.HAPPY_METER_UPDATE_BALLOON 	= 0.04;
+settings.HAPPY_METER_UPDATE_WAVE 		= 0.02;
+settings.HAPPY_METER_UPDATE_ACTIVATOR 	= 0.04;
+settings.HAPPY_METER_UPDATE_PORTAL 		= 0.2;
 
 ------------------------------------------------------------------
 -- Camera
 
-settings.CAMERA_MODE 			  = c.BOX;
+settings.CAMERA_MODE 			  = c.SIMPLE;
 settings.CAMERA_TARGET_POSITION_X = c.HALF_SCREEN_WIDTH;
 settings.CAMERA_TARGET_POSITION_Y = c.HALF_SCREEN_HEIGHT;
 

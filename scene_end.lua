@@ -10,6 +10,7 @@ local world_recipes = require('world_recipes');
 local collision     = require('collision');
 local events        = require('events');
 local camera        = require('camera');
+local UI            = require('UI');
 
 ------------------------------------------------------------------
 
@@ -60,7 +61,7 @@ function scene:show(event)
 
     if (phase == "will") then
 
-        
+        UI:reset_clock();
 
     -- Called when the scene is now on screen
     -- Insert code here to make the scene come alive
