@@ -54,7 +54,7 @@ function scene:create(event)
 
 
     -- Load a video
-    video:load(settings.VIDEO_FOLDER .. "slutt.avi", system.DocumentsDirectory )
+    video:load(settings.VIDEO_FOLDER .. "slutt.mp4", system.DocumentsDirectory )
 
     -- Add video event listener 
     video:addEventListener( "video", videoListener )

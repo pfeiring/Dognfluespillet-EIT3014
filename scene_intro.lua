@@ -54,7 +54,7 @@ function scene:create(event)
 
 
     -- Load a video
-    video:load(settings.VIDEO_FOLDER .. "intro.avi", system.DocumentsDirectory )
+    video:load(settings.VIDEO_FOLDER .. "intro.mp4", system.DocumentsDirectory )
 
     -- Add video event listener 
     video:addEventListener( "video", videoListener )
@@ -100,7 +100,7 @@ function scene:show(event)
     if (phase == "will") then
 
         if system.getInfo("environment") == "simulator" then
-            print(display.contentCenterY)
+            
             display.setDefault('background', 1, 1, 1);
             composer.gotoScene('scene_world', event);
         else
