@@ -8,10 +8,13 @@ local settings  = require('settings');
 
 ------------------------------------------------------------------
 
-camera.mode 			 = settings.CAMERA_MODE;
+function camera:initialize(world_recipe)
 
-camera.TARGET_POSITION_X = settings.CAMERA_TARGET_POSITION_X;
-camera.TARGET_POSITION_Y = settings.CAMERA_TARGET_POSITION_Y;
+    camera.mode = world_recipe.camera_mode;
+
+    camera.target_position_x = world_recipe.camera_target_position_x;
+    camera.target_position_y = world_recipe.camera_target_position_y;
+end
 
 ------------------------------------------------------------------
 
@@ -32,29 +35,29 @@ end
 
 function camera:box_update(camera_group, fly_position, world_recipe_frame)
 
-    local offset_x = camera.TARGET_POSITION_X - fly_position.x;
-    local offset_y = camera.TARGET_POSITION_Y - fly_position.y;
+    local offset_x = camera.target_position_x - fly_position.x;
+    local offset_y = camera.target_position_y - fly_position.y;
     
     -- Avoid that the desired camera position in the x direction shows black background
 
-    if (fly_position.x < world_recipe_frame.left + camera.TARGET_POSITION_X) then
+    if (fly_position.x < world_recipe_frame.left + camera.target_position_x) then
        
-        offset_x = camera.TARGET_POSITION_X - (world_recipe_frame.left + camera.TARGET_POSITION_X);
+        offset_x = camera.target_position_x - (world_recipe_frame.left + camera.target_position_x);
     
-    elseif (fly_position.x > world_recipe_frame.right - (c.SCREEN_WIDTH - camera.TARGET_POSITION_X)) then
+    elseif (fly_position.x > world_recipe_frame.right - (c.SCREEN_WIDTH - camera.target_position_x)) then
        
-        offset_x = camera.TARGET_POSITION_X - (world_recipe_frame.right - (c.SCREEN_WIDTH - camera.TARGET_POSITION_X));
+        offset_x = camera.target_position_x - (world_recipe_frame.right - (c.SCREEN_WIDTH - camera.target_position_x));
     end
 
     -- Avoid that the desired camera position in the y direction shows black background
 
-    if (fly_position.y < world_recipe_frame.top + camera.TARGET_POSITION_Y) then
+    if (fly_position.y < world_recipe_frame.top + camera.target_position_y) then
     
-        offset_y = camera.TARGET_POSITION_Y - (world_recipe_frame.top + camera.TARGET_POSITION_Y);
+        offset_y = camera.target_position_y - (world_recipe_frame.top + camera.target_position_y);
     
-    elseif (fly_position.y > world_recipe_frame.bottom - (c.SCREEN_HEIGHT - camera.TARGET_POSITION_Y)) then
+    elseif (fly_position.y > world_recipe_frame.bottom - (c.SCREEN_HEIGHT - camera.target_position_y)) then
         
-        offset_y = camera.TARGET_POSITION_Y - (world_recipe_frame.bottom - (c.SCREEN_HEIGHT - camera.TARGET_POSITION_Y));
+        offset_y = camera.target_position_y - (world_recipe_frame.bottom - (c.SCREEN_HEIGHT - camera.target_position_y));
     end
 
     camera_group.x = offset_x;
@@ -69,8 +72,8 @@ end
 
 function camera:simple_update(camera_group, fly_position, world_recipe_frame)
 
-    local offset_x = camera.TARGET_POSITION_X - fly_position.x;
-    local offset_y = camera.TARGET_POSITION_Y - fly_position.y;
+    local offset_x = camera.target_position_x - fly_position.x;
+    local offset_y = camera.target_position_y - fly_position.y;
 
     camera_group.x = offset_x;
     camera_group.y = offset_y;

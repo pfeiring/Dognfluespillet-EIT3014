@@ -42,9 +42,14 @@ function fly:construct(world_recipe, fly_group)
     
     fly_object.x = world_recipe.starting_point.x;
     fly_object.y = world_recipe.starting_point.y;
+    
+    local scale_factor = 0.4;
 
-    fly_object.xScale = -0.4;
-    fly_object.yScale = 0.4;
+    fly_object.collision_width  = fly_object.width * scale_factor;
+    fly_object.collision_height = fly_object.height * scale_factor;
+
+    fly_object.xScale = -scale_factor;
+    fly_object.yScale = scale_factor;
 
     fly_group:insert(fly_object);
 
@@ -75,7 +80,7 @@ end
 
 ------------------------------------------------------------------
 
-function fly:update()
+function fly:update(world_recipe_frame)
     
     local delta_x = fly_destination.x - fly_object.x;
     local delta_y = fly_destination.y - fly_object.y;
@@ -102,6 +107,32 @@ function fly:update()
         fly_object.xScale = -0.4;
     elseif (step_x < -0.01 * settings.FLY_SPEED) then
         fly_object.xScale = 0.4;
+    end
+
+    -- Limit movement to borders of world
+
+    local margin = 200;
+
+    if (fly_object.x > world_recipe_frame.right - margin) then
+        
+        fly_object.x      = world_recipe_frame.right - margin;
+        fly_destination.x = world_recipe_frame.right - margin;
+
+    elseif (fly_object.x < world_recipe_frame.left + margin) then
+        
+        fly_object.x      = world_recipe_frame.left + margin;
+        fly_destination.x = world_recipe_frame.left + margin;
+    end
+
+    if (fly_object.y < world_recipe_frame.top + margin) then
+        
+        fly_object.y      = world_recipe_frame.top + margin;
+        fly_destination.y = world_recipe_frame.top + margin;
+
+    elseif (fly_object.y > world_recipe_frame.bottom - margin) then
+        
+        fly_object.y      = world_recipe_frame.bottom - margin;
+        fly_destination.y = world_recipe_frame.bottom - margin;
     end
 end
 

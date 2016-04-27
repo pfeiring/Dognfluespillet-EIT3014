@@ -20,7 +20,7 @@ local world_recipe_flowers = function()
 	------------------------------------------------------------------
 	
 	world_recipe.frame = {};
-	world_recipe.frame.width = 2614 * 1.5;
+	world_recipe.frame.width = 2214 * 1.5;
 	world_recipe.frame.height = 1819 * 1.5;
 	world_recipe.frame.x = 0;
 	world_recipe.frame.y = 0;
@@ -29,6 +29,12 @@ local world_recipe_flowers = function()
 	world_recipe.frame.right = world_recipe.frame.x + world_recipe.frame.width / 2;
 	world_recipe.frame.top = world_recipe.frame.y - world_recipe.frame.height / 2;
 	world_recipe.frame.bottom = world_recipe.frame.y + world_recipe.frame.height / 2;
+
+	------------------------------------------------------------------
+
+	world_recipe.camera_mode 	 		  = c.BOX;
+	world_recipe.camera_target_position_x = c.HALF_SCREEN_WIDTH;
+	world_recipe.camera_target_position_y = c.HALF_SCREEN_HEIGHT;
 
 	------------------------------------------------------------------
 
@@ -77,8 +83,8 @@ local world_recipe_balloon = function()
 
 	------------------------------------------------------------------
 	
-	world_recipe.frame.width = 2856 * 0.8;
-	world_recipe.frame.height = 2856 * 0.8;
+	world_recipe.frame.width = 3856 * 0.8;
+	world_recipe.frame.height = 3856 * 0.8;
 	world_recipe.frame.x = 0;
 	world_recipe.frame.y = 0;
 
@@ -86,6 +92,12 @@ local world_recipe_balloon = function()
 	world_recipe.frame.right = world_recipe.frame.x + world_recipe.frame.width / 2;
 	world_recipe.frame.top = world_recipe.frame.y - world_recipe.frame.height / 2;
 	world_recipe.frame.bottom = world_recipe.frame.y + world_recipe.frame.height / 2;
+
+	------------------------------------------------------------------
+
+	world_recipe.camera_mode 	 		  = c.SIMPLE;
+	world_recipe.camera_target_position_x = c.HALF_SCREEN_WIDTH;
+	world_recipe.camera_target_position_y = c.HALF_SCREEN_HEIGHT;
 
 	------------------------------------------------------------------
 
@@ -143,15 +155,19 @@ local world_recipe_balloon = function()
 	-- Portals in circle around
 
 	n = 40;
+	N = 4;
 
 	for i = 1, n do
 		
 		theta = i / n * 2 * math.pi;
-		r 	  = 3600 * 0.8 * 0.5;
+		r 	  = 50 + 3600 * 0.8 * 0.5 - 150;
 
-		world_recipe.objects[index + i] = {file = 'portal.png', body = c.PORTAL, r = r, start_theta = theta, event = {type = c.PORTAL, world_name = c.WORLD_FLOWERS}, width = 127 * 0.8, height = 138 * 0.8, x = r * math.cos(theta), y = r * math.sin(theta) };
+		for j = 0, N do
+			world_recipe.objects[index + i + (j * n)] = {file = 'portal.png', body = c.PORTAL, r = (r + 150 * j), start_theta = theta, event = {type = c.PORTAL, world_name = c.WORLD_FLOWERS, allow_collision = (j > 0)}, width = 127 * 0.8, height = 138 * 0.8, x = (r + 150 * j) * math.cos(theta), y = (r + 150 * j) * math.sin(theta) };
+		end 
 	end
-	
+
+	index = index + n * (N + 1);
 
 	return world_recipe;
 end

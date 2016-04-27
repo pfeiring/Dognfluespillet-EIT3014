@@ -114,8 +114,9 @@ function objects:construct(world_recipe, objects_group, storage_object)
 
                 object.happy_meter = UI.happy_meter;
 
-                object.storage_object = storage_object;
-                object.world_name     = event.world_name;
+                object.storage_object  = storage_object;
+                object.world_name      = event.world_name;
+                object.allow_collision = event.allow_collision;
 
                 object:addEventListener('tap', events.portal_event);
             end
@@ -197,6 +198,21 @@ function objects:check_collisions(fly)
             object.isVisible = false;
 
             UI:update_happy_meter(object.happy_meter_gain);
+
+        elseif (object.body == c.PORTAL and not object.taken and collision:box(fly, object)) then
+
+            local portal = object;
+
+            if (portal.allow_collision) then
+
+                local storage_object = portal.storage_object;
+
+                portal.taken = true;
+                UI:update_happy_meter(settings.HAPPY_METER_UPDATE_PORTAL);
+
+                storage_object.portal_activated  = true;
+                storage_object.portal_world_name = portal.world_name;
+            end
         end
     end
 end
