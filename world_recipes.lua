@@ -46,7 +46,7 @@ local world_recipe_flowers = function()
 
 	------------------------------------------------------------------
 
-	world_recipe.objects[index + 1] = {file = 'crystals_c.jpg', perspective_factor = 0.6, width = 3508 * 0.6, height = 2480 * 0.6, x = 0, y = 0}
+	world_recipe.objects[index + 1] = {file = 'crystals_c.jpg', perspective_factor = 0.6, ppx = 0, ppy = 0, width = 3508 * 0.6, height = 2480 * 0.6, x = 0, y = 0}
 
 	index = index + 1;
 
@@ -54,6 +54,15 @@ local world_recipe_flowers = function()
 	world_recipe.objects[index + 2] = {file = 'world_flowers_color.png', id = 1, invisible = true, body = NONE, width = 2614, height = 1819, x = 0, y = 0 };	
 
 	index = index + 2;
+
+	world_recipe.objects[index + 1] = {file = 'carniv_1.png', perspective_factor = -1.01, ppx = 400, ppy = 1300, width = 1028, height = 1028, x = 400, y = 1000}
+	world_recipe.objects[index + 2] = {file = 'carniv_2.png', invisible = true, perspective_factor = -1.01, ppx = 400, ppy = 1300, width = 1028, height = 1028, x = 400, y = 1000}
+	world_recipe.objects[index + 3] = {file = 'carniv_3.png', invisible = true, perspective_factor = -1.01, ppx = 400, ppy = 1300, width = 1028, height = 1028, x = 400, y = 1000}
+	world_recipe.objects[index + 4] = {file = 'carniv_closed_b.png', invisible = true, perspective_factor = -1.01, ppx = 400, ppy = 1300, width = 1028, height = 1028, x = 400, y = 1000}
+	world_recipe.objects[index + 5] = {file = 'carniv_closed_f.png', invisible = true, front_object = true, perspective_factor = -1.01, ppx = 400, ppy = 1300, width = 1028, height = 1028, x = 400, y = 1000}
+	world_recipe.objects[index + 6] = {rectangle = true, body = c.CARNIV, invisible = true, width = 50, height = 300, fill_color = {0, 0, 1}, x = 350,  y = 900, im2_time = 30, im3_time = 60, closed_time = 90, eat_time = 200, counter = 0, im_1 = index + 1, im_2 = index + 2, im_3 = index + 3, closed_back = index + 4, closed_front = index + 5};
+
+	index = index + 6;
 
 	world_recipe.objects[index + 1] = {rectangle = true, event = {type = c.ACTIVATOR}, link = 1, invisible = true, alpha = 0.4, message_index = 3, width = 400, height = 200, fill_color = {0, 0, 1}, x = -100,  y = 800};
 

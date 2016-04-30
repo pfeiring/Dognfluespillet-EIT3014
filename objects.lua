@@ -1,5 +1,6 @@
 
 local objects = {};
+local composer = require('composer');
 
 ------------------------------------------------------------------
 
@@ -9,6 +10,7 @@ local utilities = require('utilities');
 local events 	= require('events');
 local collision = require('collision');
 local UI 		= require('UI');
+local fly_class = require('fly');
 
 ------------------------------------------------------------------
 
@@ -20,7 +22,7 @@ end
 
 ------------------------------------------------------------------
 
-function objects:construct(world_recipe, objects_group, storage_object)
+function objects:construct(world_recipe, objects_group, storage_object, front_objects_group)
 
 	for i = 1, #world_recipe.objects do
     
@@ -56,9 +58,15 @@ function objects:construct(world_recipe, objects_group, storage_object)
         object.body = recipe.body;
         object.direction = recipe.direction;
         object.perspective_factor = recipe.perspective_factor;
+        object.ppx = recipe.ppx;
+        object.ppy = recipe.ppy;
 
         container[#container + 1] = object;
         objects_group:insert(object);
+
+        if (recipe.front_object) then
+            front_objects_group:insert(object);
+        end
 
         -- Collision
 
@@ -78,6 +86,20 @@ function objects:construct(world_recipe, objects_group, storage_object)
 
                 object.start_theta  = recipe.start_theta;
                 object.r            = recipe.r;
+
+            elseif (body == c.CARNIV) then
+
+                object.im_1 = recipe.im_1;
+                object.im_2 = recipe.im_2;
+                object.im_3 = recipe.im_3;
+                object.closed_front = recipe.closed_front;
+                object.closed_back = recipe.closed_back;
+                object.im2_time = recipe.im2_time;
+                object.im3_time = recipe.im3_time;
+                object.closed_time = recipe.closed_time;
+                object.eat_time = recipe.eat_time;
+                object.counter = recipe.counter;
+                object.storage_object = storage_object;
             end
         end
 
@@ -119,6 +141,7 @@ function objects:construct(world_recipe, objects_group, storage_object)
                 object.allow_collision = event.allow_collision;
 
                 object:addEventListener('tap', events.portal_event);
+
             end
         end
     end
@@ -155,9 +178,9 @@ function objects:simulate_perspective(camera_offset)
 	for i = 1, #container do
 
         local object = container[i];
-        
+
         if (object.perspective_factor) then            
-            transition.to( object, {time = 0, x = -(camera_offset.x * object.perspective_factor), y = -(camera_offset.y * object.perspective_factor)});
+            transition.to( object, {time = 0, x = object.ppx -(camera_offset.x * object.perspective_factor), y = object.ppy -(camera_offset.y * object.perspective_factor)});
         end
     end
 end
@@ -213,6 +236,35 @@ function objects:check_collisions(fly)
                 storage_object.portal_activated  = true;
                 storage_object.portal_world_name = portal.world_name;
             end
+        elseif (object.body == c.CARNIV and collision:box(fly, object)) then
+                
+            local plant = object;
+
+            if (plant.counter > plant.eat_time) then
+
+                plant.storage_object.changing_scene = true;
+                composer.gotoScene('scene_death');
+
+            elseif (plant.counter > plant.closed_time) then
+
+                container[plant.closed_front].isVisible = true;
+                container[plant.closed_back].isVisible = true;
+                container[plant.im_3].isVisible = false;
+
+                fly_class:set_destination(350, 900);
+
+            elseif (plant.counter > plant.im3_time) then
+                
+                container[plant.im_3].isVisible = true;
+                container[plant.im_2].isVisible = false;
+                
+            elseif (plant.counter > plant.im2_time) then
+
+                container[plant.im_2].isVisible = true;
+                container[plant.im_1].isVisible = false;
+            end
+
+            plant.counter = plant.counter +1;
         end
     end
 end

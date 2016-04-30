@@ -32,6 +32,7 @@ c.WAVE          = 'wave';
 c.ACTIVATOR     = 'activator';
 c.MESSAGE       = 'message';
 c.PORTAL        = 'portal';
+c.CARNIV		= 'carniv';
 
 ------------------------------------------------------------------
 -- Camera

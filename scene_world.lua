@@ -288,6 +288,7 @@ function scene:create(event)
     background_group    = display.newGroup();
     objects_group       = display.newGroup();
     fly_group           = display.newGroup();
+    front_objects_group = display.newGroup();
     camera_group        = display.newGroup();
 
     UI_group            = display.newGroup();
@@ -295,6 +296,7 @@ function scene:create(event)
     camera_group:insert(background_group);
     camera_group:insert(objects_group);
     camera_group:insert(fly_group);
+    camera_group:insert(front_objects_group);
 
     scene_group:insert(camera_group);
     scene_group:insert(UI_group);
@@ -326,7 +328,7 @@ function scene:create(event)
 
     ------------------------------------------------------------------
 
-    objects:construct(world_recipe, objects_group, storage_object);
+    objects:construct(world_recipe, objects_group, storage_object, front_objects_group);
     objects:link();
 
     ------------------------------------------------------------------

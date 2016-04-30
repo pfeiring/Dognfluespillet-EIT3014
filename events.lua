@@ -107,4 +107,13 @@ function events.portal_event(event)
     return true;
 end
 
+function events.carniv_event(event)
+
+    local carniv = event.target;
+
+    print('carniv_event')
+
+    return true;
+end
+
 return events;

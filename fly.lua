@@ -78,6 +78,12 @@ function fly:add_to_destination(delta_x, delta_y)
     fly_destination.y = fly_destination.y + delta_y;
 end
 
+function fly:set_destination(x, y)
+
+    fly_destination.x = x;
+    fly_destination.y = y;
+end
+
 ------------------------------------------------------------------
 
 function fly:update(world_recipe_frame)
