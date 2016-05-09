@@ -33,6 +33,7 @@ c.ACTIVATOR     = 'activator';
 c.MESSAGE       = 'message';
 c.PORTAL        = 'portal';
 c.CARNIV		= 'carniv';
+c.LAMP			= 'lamp';
 
 ------------------------------------------------------------------
 -- Camera

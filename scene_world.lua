@@ -228,8 +228,9 @@ function game_loop:enterFrame(event)
         
         local camera_offset = camera:update(camera_group, fly:get_position(), world_recipe.frame);
 
+        objects:update_particles();
         objects:simulate_perspective(camera_offset);
-        objects:check_collisions(fly:get_object());
+        objects:check_collisions(fly);
 
         ------------------------------------------------------------------
 
@@ -252,6 +253,8 @@ function game_loop:enterFrame(event)
 
             Runtime:removeEventListener('enterFrame', game_loop);
             Runtime:removeEventListener('heading', game_loop);
+
+            display.setDefault('background', 1, 1, 1);
 
             storage_object.changing_scene = true;
             composer.gotoScene('scene_world', goto_options);

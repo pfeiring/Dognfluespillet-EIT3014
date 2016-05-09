@@ -9,6 +9,7 @@ local settings = require('settings');
 
 local fly_object = {};
 local fly_destination = {};
+local colored = false;
 
 ------------------------------------------------------------------
 
@@ -24,10 +25,21 @@ function fly:construct(world_recipe, fly_group)
     };
     
     local sheet_flying_fly = graphics.newImageSheet(settings.IMAGE_FOLDER .. 'sprite_fly.png', sheet_options);
+    local sheet_flying_fly_c = graphics.newImageSheet(settings.IMAGE_FOLDER .. 'sprite_fly_c.png', sheet_options);
     
     local sequences_flying_fly = {
         {
             name = 'normalFlying',
+            sheet = sheet_flying_fly,
+            start = 1,
+            count = 9,
+            time = 1000,
+            loopCount = 0,
+            loopDirection = 'forward'
+        },
+        {
+            name = 'colorFlying',
+            sheet = sheet_flying_fly_c,
             start = 1,
             count = 9,
             time = 1000,
@@ -57,10 +69,20 @@ function fly:construct(world_recipe, fly_group)
     fly_destination.x = fly_object.x;
     fly_destination.y = fly_object.y;
 
+    if (colored) then
+        fly_object:setSequence("colorFlying")
+    end
+    
     fly_object:play();
 end
 
 ------------------------------------------------------------------
+
+function fly:swap_sheet()
+    fly_object:setSequence("colorFlying")
+    fly_object:play()
+    colored = true;
+end
 
 function fly:get_object()
     return fly_object;

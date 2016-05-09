@@ -60,6 +60,10 @@ function objects:construct(world_recipe, objects_group, storage_object, front_ob
         object.perspective_factor = recipe.perspective_factor;
         object.ppx = recipe.ppx;
         object.ppy = recipe.ppy;
+        object.max_x = recipe.max_x;
+        object.max_y = recipe.max_y;
+        object.particle_speed_x = recipe.particle_speed_x;
+        object.particle_speed_y = recipe.particle_speed_y;
 
         container[#container + 1] = object;
         objects_group:insert(object);
@@ -100,6 +104,11 @@ function objects:construct(world_recipe, objects_group, storage_object, front_ob
                 object.eat_time = recipe.eat_time;
                 object.counter = recipe.counter;
                 object.storage_object = storage_object;
+
+            elseif (body == c.LAMP) then
+
+                object.lamp_on = recipe.lamp_on;
+                object.lamp_off = recipe.lamp_off;
             end
         end
 
@@ -206,23 +215,25 @@ end
 
 function objects:check_collisions(fly)
 	
+    local fly_object = fly:get_object();
+
 	for i = 1, #container do
 
         local object = container[i];
         
-        if (object.body == c.MESSAGE and not object.taken and collision:box(fly, object)) then
+        if (object.body == c.MESSAGE and not object.taken and collision:box(fly_object, object)) then
             
             object.taken = true;
             UI:show_message(object.message_index);
 
-        elseif (object.body == c.TREASURE and not object.taken and collision:box(fly, object)) then
+        elseif (object.body == c.TREASURE and not object.taken and collision:box(fly_object, object)) then
 
             object.taken = true;
             object.isVisible = false;
 
             UI:update_happy_meter(object.happy_meter_gain);
 
-        elseif (object.body == c.PORTAL and not object.taken and collision:box(fly, object)) then
+        elseif (object.body == c.PORTAL and not object.taken and collision:box(fly_object, object)) then
 
             local portal = object;
 
@@ -236,14 +247,20 @@ function objects:check_collisions(fly)
                 storage_object.portal_activated  = true;
                 storage_object.portal_world_name = portal.world_name;
             end
-        elseif (object.body == c.CARNIV and collision:box(fly, object)) then
+        elseif (object.body == c.CARNIV and collision:box(fly_object, object)) then
                 
             local plant = object;
 
             if (plant.counter > plant.eat_time) then
 
-                plant.storage_object.changing_scene = true;
-                composer.gotoScene('scene_death');
+                --Insta death:
+                --plant.storage_object.changing_scene = true;
+                --composer.gotoScene('scene_end');
+
+                UI:update_happy_meter(settings.HAPPY_METER_UPDATE_PORTAL);
+
+                plant.storage_object.portal_activated = true;
+                plant.storage_object.portal_world_name = c.WORLD_BALLOON;
 
             elseif (plant.counter > plant.closed_time) then
 
@@ -265,6 +282,42 @@ function objects:check_collisions(fly)
             end
 
             plant.counter = plant.counter +1;
+
+        elseif (object.body == c.LAMP and not object.taken and collision:box(fly_object, object)) then
+
+            local lamp = object;
+
+            container[lamp.lamp_on].isVisible = true;
+            container[lamp.lamp_off].isVisible = false;
+
+            lamp.taken = true;
+
+            fly:swap_sheet();
+
+        end
+    end
+end
+
+function objects:update_particles()
+
+    for i = 1, #container do
+
+        local object = container[i];
+
+        if (object.particle_speed_x and object.perspective_factor) then
+            
+            object.ppx = object.ppx + object.particle_speed_x;
+            if (object.ppx > object.max_x) then
+                object.ppx = -object.max_x;
+            elseif (object.ppx < -object.max_x) then
+                object.ppx = object.max_x;
+            end
+            object.ppy = object.ppy + object.particle_speed_y;
+            if (object.ppy > object.max_y) then
+                object.ppy = -object.max_y;
+            elseif (object.ppy < -object.max_y) then
+                object.ppy = object.max_y;
+            end
         end
     end
 end
