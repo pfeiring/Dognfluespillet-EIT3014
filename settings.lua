@@ -20,7 +20,7 @@ settings.DEBUG_MODE 		= c.DEBUG_WITH_EVENT;
 ------------------------------------------------------------------
 -- Basics
 
-settings.GAME_DURATION_IN_MINUTES      	= 5;           -- Minutes
+settings.GAME_DURATION_IN_MINUTES      	= 4;           -- Minutes
 
 settings.FLY_SPEED 						= 10;
 

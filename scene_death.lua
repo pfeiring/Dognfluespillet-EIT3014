@@ -42,8 +42,7 @@ function scene:create(event)
             video = nil
 
             display.setDefault('background', 1, 1, 1);
-            local curtain = display.newRect(0, 0, 4000, 4000);
-            curtain:setFillColor(0,0,0)
+            
 
             composer.gotoScene('scene_end', remembered_scene_event);
         end
@@ -53,7 +52,8 @@ function scene:create(event)
         end
     end
     
-
+    local curtain = display.newRect(0, 0, 4000, 4000);
+    curtain:setFillColor(0,0,0)
 
     -- Load a video
     video:load(settings.VIDEO_FOLDER .. "slutt.mp4", system.DocumentsDirectory )
