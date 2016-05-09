@@ -21,7 +21,7 @@ local world_recipe_flowers = function()
 	
 	world_recipe.frame = {};
 	world_recipe.frame.width = 2214 * 1.5;
-	world_recipe.frame.height = 1819 * 1.5;
+	world_recipe.frame.height = 1819 * 1.4;
 	world_recipe.frame.x = 0;
 	world_recipe.frame.y = 0;
 
@@ -214,7 +214,7 @@ local world_recipe_flowers = function()
 			forground = true;
 		end
 
-		world_recipe.objects[index + i] = {file = "dot.png", front_object = forground, perspective_factor = distance, ppx = start_x, ppy = start_y, width = 20 * distance * distance, height = 20 *distance * distance, x = 0, y = 0, fill_color = {r, g, b}, particle_speed_x = speed_x, particle_speed_y = speed_y, max_x = max_x, max_y = max_y}
+		world_recipe.objects[index + i] = {file = 'dot.png', front_object = forground, perspective_factor = distance, ppx = start_x, ppy = start_y, width = 20 * distance * distance, height = 20 *distance * distance, x = 0, y = 0, fill_color = {r, g, b}, particle_speed_x = speed_x, particle_speed_y = speed_y, max_x = max_x, max_y = max_y}
 
 	end
 
@@ -274,8 +274,8 @@ local world_recipe_balloon = function()
 
 	------------------------------------------------------------------
 	
-	-- Quick-fix to avoid problem with flover world appearing behind balloon world after being eaten.
-	world_recipe.objects[index + 1] = {file = 'white.png', body = NONE, width = 4000, height = 4000, x = 0, y = 0 };
+	-- Quick-fix to avoid problem with flower world appearing behind balloon world after being eaten.
+	world_recipe.objects[index + 1] = {rectangle = true, body = NONE, width = 4000, height = 4000, x = 0, y = 0, fill_color = {1, 1, 1}};
 
 	index = index + 1;
 

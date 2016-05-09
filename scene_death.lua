@@ -42,6 +42,8 @@ function scene:create(event)
             video = nil
 
             display.setDefault('background', 1, 1, 1);
+            local curtain = display.newRect(0, 0, 4000, 4000);
+            curtain:setFillColor(0,0,0)
 
             composer.gotoScene('scene_end', remembered_scene_event);
         end
@@ -100,8 +102,11 @@ function scene:show(event)
     if (phase == "will") then
 
         if system.getInfo("environment") == "simulator" then
-            print(display.contentCenterY)
+            
             display.setDefault('background', 1, 1, 1);
+            --local curtain = display.newRect(0, 0, 4000, 4000);
+            --curtain:setFillColor(0,0,0)
+
             composer.gotoScene('scene_end', event);
         else
             video:play()
