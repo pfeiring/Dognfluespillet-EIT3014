@@ -14,13 +14,13 @@ settings.VIDEO_FOLDER		= 'videos/';
 ------------------------------------------------------------------
 -- Debug
 
-settings.DEBUG 				= true;
+settings.DEBUG 				= false;
 settings.DEBUG_MODE 		= c.DEBUG_WITH_EVENT;
 
 ------------------------------------------------------------------
 -- Basics
 
-settings.GAME_DURATION_IN_MINUTES      	= 4;           -- Minutes
+settings.GAME_DURATION_IN_MINUTES      	= 10;           -- Minutes
 
 settings.FLY_SPEED 						= 10;
 
